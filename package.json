@@ -1,0 +1,20 @@
+{
+  "name": "wbp-productivity",
+  "version": "1.0.0",
+  "description": "Sistema de produtividade WBP - Trello + AI + Dashboards",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "node-fetch": "^2.7.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "@anthropic-ai/sdk": "^0.39.0",
+    "node-cron": "^3.0.3",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
