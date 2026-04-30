@@ -527,12 +527,8 @@
     const { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } = Recharts;
 
     // Config - SUBSTITUIR com seus valores do Supabase
-    const SUPABASE_URL = window.location.origin.includes('localhost')
-      ? 'YOUR_SUPABASE_URL'
-      : (document.querySelector('meta[name="supabase-url"]')?.content || 'https://supabase.com/dashboard/project/ciggioucwilhqpuxtzue');
-    const SUPABASE_ANON = document.querySelector('meta[name="supabase-key"]')?.content || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZ2dpb3Vjd2lsaHFwdXh0enVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MDY2MDAsImV4cCI6MjA5MzA4MjYwMH0.1JzEq9IrOPNgwr4NYiQYrVPPOTmneobPJYCvkEN8BSw
-
-    ';
+    const SUPABASE_URL = 'https://ciggioucwilhqpuxtzue.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZ2dpb3Vjd2lsaHFwdXh0enVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MDY2MDAsImV4cCI6MjA5MzA4MjYwMH0.1JzEq9IrOPNgwr4NYiQYrVPPOTmneobPJYCvkEN8BSw';
 
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     const API = window.location.origin;
