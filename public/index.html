@@ -6,461 +6,258 @@
   <title>WBP Productivity</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#06060b;--s1:#0d0d15;--s2:#14141f;--s3:#1c1c2a;--bd:#252538;--t1:#f0f0f5;--t2:#9898b0;--t3:#5a5a72;--ac:#6366f1;--ac2:#818cf8;--gn:#22c55e;--or:#f59e0b;--rd:#ef4444;--bl:#3b82f6}
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;-webkit-font-smoothing:antialiased}
-    .hide{display:none!important}
-
-    /* Login */
-    .login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at top,#14142a 0%,var(--bg) 70%)}
-    .login-card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:48px;width:380px;text-align:center}
-    .login-card h1{font-size:28px;font-weight:800;margin-bottom:8px;letter-spacing:-.02em}
-    .login-card h1 span{color:var(--ac2)}
-    .login-card p{color:var(--t2);font-size:14px;margin-bottom:32px}
-    .input{width:100%;padding:12px 16px;border-radius:10px;border:1px solid var(--bd);background:var(--s2);color:var(--t1);font-family:'Outfit',sans-serif;font-size:14px;margin-bottom:12px;outline:none;transition:border-color .2s}
-    .input:focus{border-color:var(--ac)}
-    .btn-primary{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#4f46e5,var(--ac));color:#fff;font-family:'Outfit';font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}
-    .btn-primary:hover{opacity:.9}.btn-primary:disabled{opacity:.5}
-    .error-msg{color:var(--rd);font-size:13px;margin-bottom:8px}
-
-    /* Layout */
-    .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--s1);border-right:1px solid var(--bd);padding:24px 0;display:flex;flex-direction:column;z-index:50}
-    .sidebar-brand{padding:0 24px;margin-bottom:32px;font-size:18px;font-weight:800;letter-spacing:-.02em}
-    .sidebar-brand span{color:var(--ac2)}
-    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 24px;color:var(--t2);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
-    .nav-item:hover{color:var(--t1);background:var(--s2)}
-    .nav-item.active{color:var(--ac2);border-left-color:var(--ac2);background:rgba(99,102,241,.08)}
-    .sidebar-footer{margin-top:auto;padding:16px 24px;border-top:1px solid var(--bd)}
-    .sidebar-footer .name{font-size:13px;font-weight:600}
-    .sidebar-footer .role{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
-    .sidebar-footer .logout{color:var(--rd);font-size:12px;cursor:pointer;margin-top:8px;background:none;border:none;font-family:'Outfit';padding:0}
-    .main{margin-left:220px;padding:32px;min-height:100vh}
-
-    .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
-    .page-title{font-size:24px;font-weight:700;letter-spacing:-.02em}
-    .period-bar{display:flex;gap:4px;background:var(--s2);border-radius:8px;padding:3px}
-    .period-btn{padding:6px 14px;border-radius:6px;border:none;background:transparent;color:var(--t2);font-family:'Outfit';font-size:13px;font-weight:500;cursor:pointer}
-    .period-btn.active{background:var(--ac);color:#fff}
-
-    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
-    .stat{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px}
-    .stat .label{font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;font-weight:500}
-    .stat .value{font-size:32px;font-weight:700;letter-spacing:-.03em}
-    .stat .sub{font-size:12px;color:var(--t2);margin-top:4px}
-
-    .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
-    .chart-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px}
-    .chart-card.full{grid-column:1/-1}
-    .chart-title{font-size:15px;font-weight:600;margin-bottom:16px}
-
-    .table-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:28px}
-    .table-header{padding:16px 20px;border-bottom:1px solid var(--bd);font-weight:600;font-size:15px}
-    table{width:100%;border-collapse:collapse}
-    th{text-align:left;padding:10px 16px;font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;font-weight:500;border-bottom:1px solid var(--bd)}
-    td{padding:10px 16px;font-size:13px;border-bottom:1px solid rgba(37,37,56,.5)}
-    tr:hover td{background:var(--s2)}
-    .tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
-    .tag.active{background:rgba(59,130,246,.15);color:var(--bl)}
-    .tag.completed{background:rgba(34,197,94,.08);color:var(--gn)}
-
-    .settings-section{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
-    .settings-section h3{font-size:15px;font-weight:600;margin-bottom:16px}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-    .form-group{display:flex;flex-direction:column;gap:4px}
-    .form-group label{font-size:13px;color:var(--t2)}
-    .btn{padding:8px 16px;border-radius:8px;border:1px solid var(--bd);background:var(--s2);color:var(--t1);font-family:'Outfit';font-size:13px;font-weight:500;cursor:pointer}
-    .btn:hover{background:var(--s3)}.btn.sm{padding:5px 10px;font-size:12px}
-    .role-tag{padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase}
-    .role-tag.gestao{background:rgba(239,68,68,.1);color:var(--rd)}
-    .role-tag.cs{background:rgba(245,158,11,.1);color:var(--or)}
-    .role-tag.operacao{background:rgba(59,130,246,.1);color:var(--bl)}
-
-    .empty{text-align:center;padding:48px;color:var(--t3)}
-    .toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-size:14px;background:var(--s2);border:1px solid var(--bd);z-index:1000;animation:slideUp .3s}
+    :root{--bg:#f0f2f5;--white:#fff;--sbg:#1b2537;--shov:#243044;--sact:rgba(94,186,156,.15);--ac:#5eba9c;--acd:#4a9e83;--acl:rgba(94,186,156,.1);--td:#1b2537;--tm:#5f6d7e;--tl:#9aa4b2;--bd:#e3e8ef;--sh:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.06);--shh:0 4px 12px rgba(0,0,0,.08);--rd:#e74c5e;--rdbg:#fef2f3;--or:#f5a623;--orbg:#fff8ec;--bl:#4a90d9;--blbg:#eef4fb;--pu:#7c6cdb;--pubg:#f3f1fc;--gn:#5eba9c;--gnbg:#eefaf5;--r:14px;--rs:10px}
+    *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--td);min-height:100vh;-webkit-font-smoothing:antialiased}.hide{display:none!important}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+    .login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1b2537 0%,#2d4356 50%,#5eba9c 100%)}
+    .login-card{background:var(--white);border-radius:20px;padding:48px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+    .login-card .logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;justify-content:center}
+    .login-card .logo-box{width:40px;height:40px;background:var(--ac);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:18px}
+    .login-card .logo-t{font-size:22px;font-weight:800;color:var(--td);letter-spacing:-.02em}.login-card .logo-t span{color:var(--ac)}
+    .login-card h2{font-size:20px;font-weight:700;text-align:center;margin-bottom:4px}
+    .login-card p{color:var(--tm);font-size:14px;text-align:center;margin-bottom:28px}
+    .input{width:100%;padding:12px 16px;border-radius:var(--rs);border:1.5px solid var(--bd);background:var(--bg);color:var(--td);font-family:'Plus Jakarta Sans';font-size:14px;margin-bottom:12px;outline:none;transition:all .2s}
+    .input:focus{border-color:var(--ac);background:white;box-shadow:0 0 0 3px var(--acl)}
+    select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6' fill='%239aa4b2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+    .btn-login{width:100%;padding:13px;border-radius:var(--rs);border:none;background:var(--ac);color:white;font-family:'Plus Jakarta Sans';font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}.btn-login:hover{background:var(--acd)}.btn-login:disabled{opacity:.6}
+    .error-msg{color:var(--rd);font-size:13px;margin-bottom:8px;text-align:center}
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--sbg);padding:0;display:flex;flex-direction:column;z-index:50}
+    .sidebar-top{padding:24px 20px 20px}.sidebar .logo{display:flex;align-items:center;gap:10px}
+    .sidebar .logo-box{width:36px;height:36px;background:var(--ac);border-radius:9px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:16px;flex-shrink:0}
+    .sidebar .logo-t{font-size:17px;font-weight:700;color:white}.sidebar .logo-t span{color:var(--ac)}
+    .sidebar-user{margin:8px 16px;padding:14px;background:var(--shov);border-radius:var(--rs);display:flex;align-items:center;gap:12px}
+    .avatar{width:38px;height:38px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:15px;flex-shrink:0}
+    .sidebar-user .uname{font-size:13px;font-weight:600;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sidebar-user .urole{font-size:11px;color:var(--tl);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+    .sidebar-nav{flex:1;padding:0 12px}
+    .nav-label{font-size:10px;color:var(--tl);text-transform:uppercase;letter-spacing:.08em;padding:16px 12px 8px;font-weight:600}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;color:rgba(255,255,255,.6);font-size:14px;font-weight:500;cursor:pointer;border-radius:8px;transition:all .15s;margin-bottom:2px}
+    .nav-item:hover{color:white;background:var(--shov)}.nav-item.active{color:var(--ac);background:var(--sact)}
+    .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
+    .logout-btn{color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;background:none;border:none;font-family:'Plus Jakarta Sans';padding:6px 0;transition:color .15s}.logout-btn:hover{color:var(--rd)}
+    .main{margin-left:240px;padding:28px 32px;min-height:100vh}
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+    .greeting h1{font-size:24px;font-weight:700;letter-spacing:-.02em}.greeting p{font-size:14px;color:var(--tm);margin-top:2px}
+    .controls{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+    .period-bar{display:flex;gap:4px;background:var(--white);border:1px solid var(--bd);border-radius:var(--rs);padding:3px;box-shadow:var(--sh)}
+    .period-btn{padding:7px 16px;border-radius:8px;border:none;background:transparent;color:var(--tm);font-family:'Plus Jakarta Sans';font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+    .period-btn.active{background:var(--ac);color:white;box-shadow:0 2px 4px rgba(94,186,156,.3)}
+    .filter-bar{display:flex;gap:8px}
+    .filter-select{padding:7px 32px 7px 12px;border-radius:8px;border:1px solid var(--bd);background:white;color:var(--td);font-family:'Plus Jakarta Sans';font-size:13px;font-weight:500;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6' fill='%239aa4b2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;box-shadow:var(--sh);transition:border-color .15s}
+    .filter-select:focus{border-color:var(--ac)}
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+    .stat-card{background:var(--white);border-radius:var(--r);padding:20px;box-shadow:var(--sh);border:1px solid var(--bd);transition:box-shadow .2s}.stat-card:hover{box-shadow:var(--shh)}
+    .stat-card .stat-bar{width:36px;height:4px;border-radius:2px;margin-bottom:14px}
+    .stat-card .stat-label{font-size:13px;color:var(--tm);font-weight:500;margin-bottom:6px}
+    .stat-card .stat-value{font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--td)}.stat-card .stat-value.red{color:var(--rd)}
+    .stat-card .stat-sub{font-size:12px;color:var(--tl);margin-top:4px}
+    .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+    .chart-card{background:var(--white);border-radius:var(--r);padding:20px;box-shadow:var(--sh);border:1px solid var(--bd)}.chart-card.full{grid-column:1/-1}
+    .chart-title{font-size:15px;font-weight:700;color:var(--td);margin-bottom:16px}
+    .table-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--bd);overflow:hidden;margin-bottom:24px}
+    .table-top{padding:18px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd)}.table-top h3{font-size:15px;font-weight:700}
+    table{width:100%;border-collapse:collapse}th{text-align:left;padding:10px 16px;font-size:11px;color:var(--tl);text-transform:uppercase;letter-spacing:.06em;font-weight:600;background:#fafbfc;border-bottom:1px solid var(--bd)}
+    td{padding:12px 16px;font-size:13px;border-bottom:1px solid #f3f4f6;color:var(--td)}tr:last-child td{border-bottom:none}tr:hover td{background:#f9fafb}
+    .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+    .tag.active{background:var(--blbg);color:var(--bl)}.tag.completed{background:var(--gnbg);color:var(--gn)}.tag.overdue{background:var(--rdbg);color:var(--rd)}
+    .tag-cat{display:inline-flex;align-items:center;gap:5px;font-size:12px}.tag-dot{width:8px;height:8px;border-radius:50%}
+    .settings-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--bd);padding:24px;margin-bottom:20px}
+    .settings-card h3{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.form-group{display:flex;flex-direction:column;gap:5px}.form-group label{font-size:13px;color:var(--tm);font-weight:500}
+    .btn{padding:9px 18px;border-radius:var(--rs);border:1px solid var(--bd);background:white;color:var(--td);font-family:'Plus Jakarta Sans';font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}.btn:hover{background:var(--bg)}
+    .btn-accent{background:var(--ac);color:white;border-color:var(--ac)}.btn-accent:hover{background:var(--acd)}.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
+    .role-tag{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+    .role-tag.gestao{background:var(--rdbg);color:var(--rd)}.role-tag.cs{background:var(--orbg);color:var(--or)}.role-tag.operacao{background:var(--blbg);color:var(--bl)}
+    .conn-ok{padding:12px 16px;background:var(--gnbg);border-radius:var(--rs);font-weight:600;font-size:13px;color:var(--gn)}
+    .toast{position:fixed;bottom:24px;right:24px;padding:14px 22px;border-radius:var(--rs);font-size:14px;font-weight:500;background:white;box-shadow:0 8px 30px rgba(0,0,0,.12);z-index:1000;animation:slideUp .3s;border-left:4px solid}
     .toast.success{border-color:var(--gn);color:var(--gn)}.toast.error{border-color:var(--rd);color:var(--rd)}
     @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-
-    @media(max-width:1024px){.sidebar{display:none}.main{margin-left:0}.stats-grid,.form-row{grid-template-columns:repeat(2,1fr)}.chart-grid{grid-template-columns:1fr}}
+    @media(max-width:1024px){.sidebar{display:none}.main{margin-left:0}.stats-grid{grid-template-columns:repeat(2,1fr)}.charts-grid,.form-grid{grid-template-columns:1fr}.filter-bar{flex-wrap:wrap}}
   </style>
 </head>
 <body>
-
-<!-- LOGIN PAGE -->
 <div id="loginPage" class="login-page">
   <div class="login-card">
-    <h1>WBP <span>Productivity</span></h1>
-    <p>Mensure a produtividade da sua equipe</p>
+    <div class="logo"><div class="logo-box">W</div><div class="logo-t">WBP <span>Productivity</span></div></div>
+    <h2>Bem-vindo de volta</h2>
+    <p>Entre com suas credenciais para continuar</p>
     <form id="loginForm">
-      <input class="input" type="email" id="loginEmail" placeholder="Email" required />
-      <input class="input" type="password" id="loginPass" placeholder="Senha" required />
+      <input class="input" type="email" id="loginEmail" placeholder="Seu email" required />
+      <input class="input" type="password" id="loginPass" placeholder="Sua senha" required />
       <div id="loginError" class="error-msg hide"></div>
-      <button class="btn-primary" type="submit" id="loginBtn">Entrar</button>
+      <button class="btn-login" type="submit" id="loginBtn">Entrar</button>
     </form>
   </div>
 </div>
-
-<!-- APP -->
 <div id="appPage" class="hide">
   <div class="sidebar">
-    <div class="sidebar-brand">WBP <span>Prod</span></div>
-    <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">📊 Dashboard</div>
-    <div class="nav-item" onclick="showPage('settings')" id="nav-settings" style="display:none">⚙️ Configuracoes</div>
-    <div class="sidebar-footer">
-      <div class="name" id="userName"></div>
-      <div class="role" id="userRole"></div>
-      <button class="logout" onclick="logout()">Sair</button>
+    <div class="sidebar-top"><div class="logo"><div class="logo-box">W</div><div class="logo-t">WBP <span>Prod</span></div></div></div>
+    <div class="sidebar-user">
+      <div class="avatar" id="userAvatar">F</div>
+      <div><div class="uname" id="sidebarName">--</div><div class="urole" id="sidebarRole">--</div></div>
     </div>
+    <div class="sidebar-nav">
+      <div class="nav-label">Menu</div>
+      <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">Dashboard</div>
+      <div class="nav-item" onclick="showPage('settings')" id="nav-settings" style="display:none">Configuracoes</div>
+    </div>
+    <div class="sidebar-footer"><button class="logout-btn" onclick="logout()">Sair da conta</button></div>
   </div>
-
   <div class="main">
-    <!-- DASHBOARD -->
     <div id="page-dashboard">
       <div class="page-header">
-        <h1 class="page-title">Dashboard</h1>
-        <div class="period-bar">
-          <button class="period-btn" onclick="setPeriod(7)">7d</button>
-          <button class="period-btn" onclick="setPeriod(14)">14d</button>
-          <button class="period-btn active" onclick="setPeriod(30)">30d</button>
-          <button class="period-btn" onclick="setPeriod(90)">90d</button>
+        <div class="greeting"><h1 id="greetingText">Bom dia</h1><p id="greetingDate">--</p></div>
+        <div class="controls">
+          <div class="period-bar">
+            <button class="period-btn" onclick="setPeriod(7)">7 dias</button>
+            <button class="period-btn" onclick="setPeriod(14)">14 dias</button>
+            <button class="period-btn active" onclick="setPeriod(30)">30 dias</button>
+            <button class="period-btn" onclick="setPeriod(90)">90 dias</button>
+          </div>
+          <div class="filter-bar">
+            <select class="filter-select" id="filterClient" onchange="loadDashboard()"><option value="all">Todos os clientes</option></select>
+            <select class="filter-select" id="filterPerson" onchange="loadDashboard()"><option value="all">Todos os analistas</option></select>
+          </div>
         </div>
       </div>
-
       <div class="stats-grid">
-        <div class="stat"><div class="label">Cards ativos</div><div class="value" id="statActive">-</div></div>
-        <div class="stat"><div class="label">Criados</div><div class="value" id="statCreated">-</div></div>
-        <div class="stat"><div class="label">Concluidos</div><div class="value" id="statCompleted">-</div></div>
-        <div class="stat"><div class="label">Tempo medio</div><div class="value" id="statAvg">-</div><div class="sub">para conclusao</div></div>
+        <div class="stat-card"><div class="stat-bar" style="background:var(--bl)"></div><div class="stat-label">Total de tarefas</div><div class="stat-value" id="statTotal">--</div></div>
+        <div class="stat-card"><div class="stat-bar" style="background:var(--or)"></div><div class="stat-label">Pendentes</div><div class="stat-value" id="statActive">--</div></div>
+        <div class="stat-card"><div class="stat-bar" style="background:var(--gn)"></div><div class="stat-label">Concluidas</div><div class="stat-value" id="statCompleted">--</div></div>
+        <div class="stat-card"><div class="stat-bar" style="background:var(--pu)"></div><div class="stat-label">Taxa de conclusao</div><div class="stat-value" id="statRate">--</div></div>
+        <div class="stat-card"><div class="stat-bar" style="background:var(--rd)"></div><div class="stat-label">Atrasadas</div><div class="stat-value red" id="statOverdue">--</div></div>
+        <div class="stat-card"><div class="stat-bar" style="background:var(--bl)"></div><div class="stat-label">Tempo medio</div><div class="stat-value" id="statAvg">--</div><div class="stat-sub">para conclusao</div></div>
       </div>
-
-      <div class="chart-grid">
-        <div class="chart-card"><div class="chart-title">Por Cliente</div><canvas id="chartClient"></canvas></div>
-        <div class="chart-card"><div class="chart-title">Por Categoria</div><canvas id="chartCategory"></canvas></div>
-        <div class="chart-card full"><div class="chart-title">Criados vs Concluidos por Semana</div><canvas id="chartTimeline" height="80"></canvas></div>
-        <div class="chart-card full" id="personChartWrap"><div class="chart-title">Performance por Pessoa</div><canvas id="chartPerson" height="80"></canvas></div>
+      <div class="charts-grid">
+        <div class="chart-card"><div class="chart-title">Desempenho por cliente</div><canvas id="chartClient"></canvas></div>
+        <div class="chart-card"><div class="chart-title">Distribuicao por categoria</div><canvas id="chartCategory"></canvas></div>
+        <div class="chart-card full"><div class="chart-title">Evolucao semanal</div><canvas id="chartTimeline" height="80"></canvas></div>
+        <div class="chart-card full" id="personChartWrap"><div class="chart-title">Performance por pessoa</div><canvas id="chartPerson" height="80"></canvas></div>
       </div>
-
       <div class="table-card">
-        <div class="table-header">Cards Recentes</div>
-        <table><thead><tr><th>Card</th><th>Cliente</th><th>Categoria</th><th>Status</th><th>Atribuido</th><th>Tempo</th></tr></thead>
+        <div class="table-top"><h3>Atividades recentes</h3></div>
+        <table><thead><tr><th>Card</th><th>Cliente</th><th>Categoria</th><th>Status</th><th>Responsavel</th><th>Tempo</th></tr></thead>
         <tbody id="recentTable"></tbody></table>
       </div>
     </div>
-
-    <!-- SETTINGS -->
     <div id="page-settings" class="hide">
-      <h1 class="page-title" style="margin-bottom:28px">Configuracoes</h1>
-
-      <div class="settings-section">
-        <h3>Conexao Trello <button class="btn sm" onclick="syncNow()" style="float:right">Sync agora</button></h3>
+      <div class="page-header"><div class="greeting"><h1>Configuracoes</h1><p>Gerencie conexoes e equipe</p></div></div>
+      <div class="settings-card">
+        <h3>Conexao Trello <button class="btn btn-sm" onclick="syncNow()">Sincronizar</button></h3>
         <div id="connStatus"></div>
         <form id="connForm" class="hide">
-          <div class="form-row">
+          <div class="form-grid">
             <div class="form-group"><label>Trello API Key</label><input class="input" id="connKey" /></div>
             <div class="form-group"><label>Trello Token</label><input class="input" id="connToken" /></div>
           </div>
-          <div class="form-group" style="margin-bottom:12px"><label>Board IDs (separados por virgula)</label><input class="input" id="connBoards" /></div>
-          <button class="btn-primary" type="submit" style="width:auto;padding:10px 24px">Conectar</button>
+          <div class="form-group" style="margin-top:14px"><label>Board IDs (virgula)</label><input class="input" id="connBoards" /></div>
+          <button class="btn btn-accent" type="submit" style="margin-top:14px">Conectar Trello</button>
         </form>
       </div>
-
-      <div class="settings-section">
-        <h3>Adicionar Usuario</h3>
+      <div class="settings-card">
+        <h3>Novo usuario</h3>
         <form id="addUserForm">
-          <div class="form-row">
+          <div class="form-grid">
             <div class="form-group"><label>Nome</label><input class="input" id="newName" required /></div>
             <div class="form-group"><label>Email</label><input class="input" type="email" id="newEmail" required /></div>
-          </div>
-          <div class="form-row">
             <div class="form-group"><label>Senha inicial</label><input class="input" id="newPass" required /></div>
-            <div class="form-group"><label>Role</label>
-              <select class="input" id="newRole"><option value="operacao">Operacao</option><option value="cs">CS</option><option value="gestao">Gestao</option></select>
-            </div>
+            <div class="form-group"><label>Permissao</label><select class="input" id="newRole"><option value="operacao">Operacao</option><option value="cs">CS</option><option value="gestao">Gestao</option></select></div>
           </div>
-          <button class="btn-primary" type="submit" style="width:auto;padding:10px 24px">Criar Usuario</button>
+          <button class="btn btn-accent" type="submit" style="margin-top:14px">Criar usuario</button>
         </form>
       </div>
-
       <div class="table-card">
-        <div class="table-header">Usuarios</div>
-        <table><thead><tr><th>Nome</th><th>Email</th><th>Role</th><th>Clientes</th></tr></thead>
-        <tbody id="usersTable"></tbody></table>
+        <div class="table-top"><h3>Equipe</h3></div>
+        <table><thead><tr><th>Nome</th><th>Email</th><th>Permissao</th><th>Clientes</th></tr></thead><tbody id="usersTable"></tbody></table>
       </div>
     </div>
   </div>
 </div>
-
 <script>
-// ============ CONFIG ============
-var SUPABASE_URL = 'https://ciggioucwilhqpuxtzue.supabase.co';
-var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZ2dpb3Vjd2lsaHFwdXh0enVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MDY2MDAsImV4cCI6MjA5MzA4MjYwMH0.1JzEq9IrOPNgwr4NYiQYrVPPOTmneobPJYCvkEN8BSw';
+var SUPABASE_URL='https://ciggioucwilhqpuxtzue.supabase.co';
+var SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZ2dpb3Vjd2lsaHFwdXh0enVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MDY2MDAsImV4cCI6MjA5MzA4MjYwMH0.1JzEq9IrOPNgwr4NYiQYrVPPOTmneobPJYCvkEN8BSw';
+var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
+var API=window.location.origin,currentUser=null,currentPeriod=30,charts={};
+var CAT_LABELS={midia_paga:'Midia Paga',social_media:'Social Media',crm:'CRM',ai_automacao:'AI/Automacao',tracking_dados:'Tracking',estrategia:'Estrategia',criacao:'Criacao',operacional:'Operacional',sem_categoria:'Outros'};
+var COLORS=['#5eba9c','#4a90d9','#7c6cdb','#f5a623','#e74c5e','#ec4899','#14b8a6','#8b5cf6','#f97316','#06b6d4'];
+Chart.defaults.color='#9aa4b2';Chart.defaults.borderColor='#e3e8ef';Chart.defaults.font.family='Plus Jakarta Sans';Chart.defaults.font.weight=500;
 
-var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-var API = window.location.origin;
-var currentUser = null;
-var currentPeriod = 30;
-var charts = {};
+async function apiCall(path,opts){var s=(await sb.auth.getSession()).data.session;if(!s)throw new Error('x');
+  var r=await fetch(API+'/api'+path,{...opts,headers:{'Authorization':'Bearer '+s.access_token,'Content-Type':'application/json',...(opts?.headers||{})}});return r.json();}
 
-var CAT_LABELS = {
-  midia_paga:'Midia Paga', social_media:'Social Media', crm:'CRM', ai_automacao:'AI/Automacao',
-  tracking_dados:'Tracking/Dados', estrategia:'Estrategia', criacao:'Criacao', operacional:'Operacional', sem_categoria:'Sem categoria'
-};
-var COLORS = ['#6366f1','#22c55e','#f59e0b','#ef4444','#3b82f6','#ec4899','#14b8a6','#8b5cf6','#f97316','#06b6d4'];
+function getFilterParams(){var c=document.getElementById('filterClient').value;var p=document.getElementById('filterPerson').value;
+  var params='';if(c&&c!=='all')params+='&client='+encodeURIComponent(c);if(p&&p!=='all')params+='&person='+encodeURIComponent(p);return params;}
 
-Chart.defaults.color = '#9898b0';
-Chart.defaults.borderColor = '#252538';
-Chart.defaults.font.family = 'Outfit';
+document.getElementById('loginForm').onsubmit=async function(e){e.preventDefault();var btn=document.getElementById('loginBtn'),err=document.getElementById('loginError');btn.disabled=true;err.classList.add('hide');
+  var{error}=await sb.auth.signInWithPassword({email:document.getElementById('loginEmail').value,password:document.getElementById('loginPass').value});
+  if(error){err.textContent=error.message;err.classList.remove('hide');btn.disabled=false;}else initApp();};
 
-// ============ AUTH ============
-async function apiCall(path, opts) {
-  var session = (await sb.auth.getSession()).data.session;
-  if (!session) throw new Error('Nao autenticado');
-  var res = await fetch(API + '/api' + path, {
-    ...opts,
-    headers: { 'Authorization':'Bearer ' + session.access_token, 'Content-Type':'application/json', ...(opts?.headers||{}) }
-  });
-  return res.json();
-}
+async function initApp(){var s=(await sb.auth.getSession()).data.session;if(!s){showLogin();return;}
+  try{currentUser=await apiCall('/admin/me');}catch(e){showLogin();return;}
+  document.getElementById('loginPage').classList.add('hide');document.getElementById('appPage').classList.remove('hide');
+  document.getElementById('sidebarName').textContent=currentUser.name;document.getElementById('sidebarRole').textContent=currentUser.role;
+  document.getElementById('userAvatar').textContent=(currentUser.name||'U')[0].toUpperCase();
+  var h=new Date().getHours();document.getElementById('greetingText').textContent=(h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+', '+(currentUser.name||'').split(' ')[0];
+  document.getElementById('greetingDate').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  if(currentUser.role==='gestao')document.getElementById('nav-settings').style.display='';
+  if(currentUser.role==='operacao')document.getElementById('personChartWrap').style.display='none';
+  loadFilters();loadDashboard();}
 
-document.getElementById('loginForm').onsubmit = async function(e) {
-  e.preventDefault();
-  var btn = document.getElementById('loginBtn');
-  var errEl = document.getElementById('loginError');
-  btn.disabled = true; errEl.classList.add('hide');
+function showLogin(){document.getElementById('loginPage').classList.remove('hide');document.getElementById('appPage').classList.add('hide');document.getElementById('loginBtn').disabled=false;}
+async function logout(){await sb.auth.signOut();currentUser=null;showLogin();}
+function showPage(p){document.querySelectorAll('.nav-item').forEach(function(e){e.classList.remove('active')});document.getElementById('nav-'+p).classList.add('active');
+  document.getElementById('page-dashboard').classList.add('hide');document.getElementById('page-settings').classList.add('hide');document.getElementById('page-'+p).classList.remove('hide');if(p==='settings')loadSettings();}
+function setPeriod(d){currentPeriod=d;document.querySelectorAll('.period-btn').forEach(function(b){b.classList.remove('active')});event.target.classList.add('active');loadDashboard();}
 
-  var { error } = await sb.auth.signInWithPassword({
-    email: document.getElementById('loginEmail').value,
-    password: document.getElementById('loginPass').value,
-  });
+async function loadFilters(){try{var f=await apiCall('/metrics/filters');var cs=document.getElementById('filterClient');var ps=document.getElementById('filterPerson');
+  cs.innerHTML='<option value="all">Todos os clientes</option>';(f.clients||[]).forEach(function(c){cs.innerHTML+='<option value="'+c+'">'+c+'</option>';});
+  ps.innerHTML='<option value="all">Todos os analistas</option>';(f.people||[]).forEach(function(p){ps.innerHTML+='<option value="'+p+'">'+p+'</option>';});
+  }catch(e){}}
 
-  if (error) { errEl.textContent = error.message; errEl.classList.remove('hide'); btn.disabled = false; }
-  else { await initApp(); }
-};
+async function loadDashboard(){var fp=getFilterParams();var d=currentPeriod;
+  var[ov,cl,cat,per,tl,rc]=await Promise.all([apiCall('/metrics/overview?days='+d+fp),apiCall('/metrics/by-client?days='+d+fp),apiCall('/metrics/by-category?days='+d+fp),
+    apiCall('/metrics/by-person?days='+d+fp),apiCall('/metrics/timeline?days='+d+fp),apiCall('/metrics/recent-cards?limit=12'+fp)]);
 
-async function initApp() {
-  var session = (await sb.auth.getSession()).data.session;
-  if (!session) { showLogin(); return; }
+  document.getElementById('statTotal').textContent=ov.totalCards||0;document.getElementById('statActive').textContent=ov.activeCards||0;
+  document.getElementById('statCompleted').textContent=ov.completedCards||0;document.getElementById('statRate').textContent=(ov.completionRate||0)+'%';
+  document.getElementById('statOverdue').textContent=ov.overdueCards||0;
+  document.getElementById('statAvg').textContent=ov.avgCompletionHours>24?(ov.avgCompletionHours/24).toFixed(1)+'d':(ov.avgCompletionHours||0)+'h';
 
-  try {
-    currentUser = await apiCall('/admin/me');
-  } catch(e) {
-    showLogin(); return;
-  }
+  dc('chartClient');charts.chartClient=new Chart(document.getElementById('chartClient'),{type:'bar',data:{labels:(cl||[]).map(function(c){return c.client}),datasets:[{label:'Concluidos',data:(cl||[]).map(function(c){return c.completed}),backgroundColor:'#5eba9c',borderRadius:6},{label:'Ativos',data:(cl||[]).map(function(c){return c.active}),backgroundColor:'#4a90d9',borderRadius:6}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true,pointStyle:'circle'}}},scales:{x:{grid:{color:'#f0f2f5'}},y:{grid:{display:false}}}}});
 
-  document.getElementById('loginPage').classList.add('hide');
-  document.getElementById('appPage').classList.remove('hide');
-  document.getElementById('userName').textContent = currentUser.name;
-  document.getElementById('userRole').textContent = currentUser.role;
+  dc('chartCategory');charts.chartCategory=new Chart(document.getElementById('chartCategory'),{type:'doughnut',data:{labels:(cat||[]).map(function(c){return CAT_LABELS[c.category]||c.category}),datasets:[{data:(cat||[]).map(function(c){return c.total}),backgroundColor:COLORS.slice(0,(cat||[]).length),borderWidth:0,hoverOffset:6}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{padding:12,usePointStyle:true,pointStyle:'circle',font:{size:11}}}}}});
 
-  if (currentUser.role === 'gestao') {
-    document.getElementById('nav-settings').style.display = '';
-  }
-  if (currentUser.role === 'operacao') {
-    document.getElementById('personChartWrap').style.display = 'none';
-  }
+  dc('chartTimeline');charts.chartTimeline=new Chart(document.getElementById('chartTimeline'),{type:'line',data:{labels:(tl||[]).map(function(t){var x=new Date(t.week);return x.getDate()+'/'+(x.getMonth()+1)}),datasets:[{label:'Criados',data:(tl||[]).map(function(t){return t.created}),borderColor:'#4a90d9',backgroundColor:'rgba(74,144,217,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#4a90d9',borderWidth:2},{label:'Concluidos',data:(tl||[]).map(function(t){return t.completed}),borderColor:'#5eba9c',backgroundColor:'rgba(94,186,156,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#5eba9c',borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true,pointStyle:'circle'}}},scales:{x:{grid:{color:'#f0f2f5'}},y:{grid:{color:'#f0f2f5'},beginAtZero:true}}}});
 
-  loadDashboard();
-}
+  if(currentUser.role!=='operacao'){dc('chartPerson');charts.chartPerson=new Chart(document.getElementById('chartPerson'),{type:'bar',data:{labels:(per||[]).map(function(p){return p.name}),datasets:[{label:'Concluidos',data:(per||[]).map(function(p){return p.completed}),backgroundColor:'#5eba9c',borderRadius:6},{label:'Ativos',data:(per||[]).map(function(p){return p.active}),backgroundColor:'#4a90d9',borderRadius:6}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true,pointStyle:'circle'}}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f2f5'},beginAtZero:true}}}});}
 
-function showLogin() {
-  document.getElementById('loginPage').classList.remove('hide');
-  document.getElementById('appPage').classList.add('hide');
-  document.getElementById('loginBtn').disabled = false;
-}
+  var tb=document.getElementById('recentTable');
+  tb.innerHTML=(rc||[]).map(function(c){var ts=c.time_to_complete_hours?(c.time_to_complete_hours>24?(c.time_to_complete_hours/24).toFixed(1)+'d':c.time_to_complete_hours.toFixed(0)+'h'):'--';
+    var ci=Object.keys(CAT_LABELS).indexOf(c.category);var dc2=ci>=0?COLORS[ci%COLORS.length]:'#ccc';
+    var isOverdue=c.status==='active'&&c.due_date&&new Date(c.due_date)<new Date();
+    var statusTag=isOverdue?'overdue':c.status;var statusLabel=isOverdue?'Atrasado':c.status==='completed'?'Concluido':'Ativo';
+    return'<tr><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500'+(isOverdue?';color:var(--rd)':'')+'" >'+c.title+'</td>'+
+      '<td style="color:var(--tm)">'+( c.client||'--')+'</td>'+
+      '<td><span class="tag-cat"><span class="tag-dot" style="background:'+dc2+'"></span>'+(CAT_LABELS[c.category]||c.category||'--')+'</span></td>'+
+      '<td><span class="tag '+statusTag+'">'+statusLabel+'</span></td>'+
+      '<td style="font-size:12px;color:var(--tm)">'+((c.assigned_names||[]).join(', ')||'--')+'</td>'+
+      '<td style="font-family:JetBrains Mono;font-size:12px;color:var(--tm)">'+ts+'</td></tr>';}).join('');}
 
-async function logout() {
-  await sb.auth.signOut();
-  currentUser = null;
-  showLogin();
-}
+function dc(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
 
-// ============ NAVIGATION ============
-function showPage(page) {
-  document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
-  document.getElementById('nav-' + page).classList.add('active');
-  document.getElementById('page-dashboard').classList.add('hide');
-  document.getElementById('page-settings').classList.add('hide');
-  document.getElementById('page-' + page).classList.remove('hide');
+async function loadSettings(){var conn=await apiCall('/admin/trello-connection');var ce=document.getElementById('connStatus'),cf=document.getElementById('connForm');
+  if(conn&&conn.trello_api_key){ce.innerHTML='<div class="conn-ok">Trello conectado — '+(conn.board_ids||[]).length+' board(s) sincronizados</div>';cf.classList.add('hide');}
+  else{ce.innerHTML='';cf.classList.remove('hide');}
+  var users=await apiCall('/admin/users');document.getElementById('usersTable').innerHTML=(users||[]).map(function(u){
+    return'<tr><td style="font-weight:500">'+u.name+'</td><td style="font-size:12px;color:var(--tm)">'+u.email+'</td><td><span class="role-tag '+u.role+'">'+u.role+'</span></td><td style="font-size:12px;color:var(--tm)">'+((u.clients||[]).join(', ')||'--')+'</td></tr>';}).join('');}
 
-  if (page === 'settings') loadSettings();
-}
-
-function setPeriod(d) {
-  currentPeriod = d;
-  document.querySelectorAll('.period-btn').forEach(function(b) { b.classList.remove('active'); });
-  event.target.classList.add('active');
-  loadDashboard();
-}
-
-// ============ DASHBOARD ============
-async function loadDashboard() {
-  var [ov, cl, cat, per, tl, rc] = await Promise.all([
-    apiCall('/metrics/overview?days=' + currentPeriod),
-    apiCall('/metrics/by-client?days=' + currentPeriod),
-    apiCall('/metrics/by-category?days=' + currentPeriod),
-    apiCall('/metrics/by-person?days=' + currentPeriod),
-    apiCall('/metrics/timeline?days=' + currentPeriod),
-    apiCall('/metrics/recent-cards?limit=15'),
-  ]);
-
-  // Stats
-  document.getElementById('statActive').textContent = ov.activeCards || 0;
-  document.getElementById('statCreated').textContent = ov.createdCards || 0;
-  document.getElementById('statCompleted').textContent = ov.completedCards || 0;
-  var avgText = ov.avgCompletionHours > 24
-    ? (ov.avgCompletionHours / 24).toFixed(1) + 'd'
-    : (ov.avgCompletionHours || 0) + 'h';
-  document.getElementById('statAvg').textContent = avgText;
-
-  // Client chart
-  destroyChart('chartClient');
-  charts.chartClient = new Chart(document.getElementById('chartClient'), {
-    type: 'bar',
-    data: {
-      labels: cl.map(function(c) { return c.client; }),
-      datasets: [
-        { label: 'Concluidos', data: cl.map(function(c) { return c.completed; }), backgroundColor: '#22c55e' },
-        { label: 'Ativos', data: cl.map(function(c) { return c.active; }), backgroundColor: '#3b82f6' },
-      ]
-    },
-    options: { indexAxis: 'y', responsive: true, plugins: { legend: { position: 'bottom' } },
-      scales: { x: { grid: { color: '#1c1c2a' } }, y: { grid: { display: false } } } }
-  });
-
-  // Category chart
-  destroyChart('chartCategory');
-  charts.chartCategory = new Chart(document.getElementById('chartCategory'), {
-    type: 'doughnut',
-    data: {
-      labels: cat.map(function(c) { return CAT_LABELS[c.category] || c.category; }),
-      datasets: [{ data: cat.map(function(c) { return c.total; }), backgroundColor: COLORS.slice(0, cat.length) }]
-    },
-    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { padding: 12, font: { size: 11 } } } } }
-  });
-
-  // Timeline chart
-  destroyChart('chartTimeline');
-  charts.chartTimeline = new Chart(document.getElementById('chartTimeline'), {
-    type: 'line',
-    data: {
-      labels: tl.map(function(t) { var d = new Date(t.week); return d.getDate() + '/' + (d.getMonth()+1); }),
-      datasets: [
-        { label: 'Criados', data: tl.map(function(t) { return t.created; }), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,.1)', fill: true, tension: .3 },
-        { label: 'Concluidos', data: tl.map(function(t) { return t.completed; }), borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,.1)', fill: true, tension: .3 },
-      ]
-    },
-    options: { responsive: true, plugins: { legend: { position: 'bottom' } },
-      scales: { x: { grid: { color: '#1c1c2a' } }, y: { grid: { color: '#1c1c2a' }, beginAtZero: true } } }
-  });
-
-  // Person chart
-  if (currentUser.role !== 'operacao') {
-    destroyChart('chartPerson');
-    charts.chartPerson = new Chart(document.getElementById('chartPerson'), {
-      type: 'bar',
-      data: {
-        labels: per.map(function(p) { return p.name; }),
-        datasets: [
-          { label: 'Concluidos', data: per.map(function(p) { return p.completed; }), backgroundColor: '#22c55e' },
-          { label: 'Ativos', data: per.map(function(p) { return p.active; }), backgroundColor: '#3b82f6' },
-        ]
-      },
-      options: { responsive: true, plugins: { legend: { position: 'bottom' } },
-        scales: { x: { grid: { display: false } }, y: { grid: { color: '#1c1c2a' }, beginAtZero: true } } }
-    });
-  }
-
-  // Recent cards table
-  var tbody = document.getElementById('recentTable');
-  tbody.innerHTML = (rc || []).map(function(c) {
-    var timeStr = c.time_to_complete_hours
-      ? (c.time_to_complete_hours > 24 ? (c.time_to_complete_hours/24).toFixed(1) + 'd' : c.time_to_complete_hours.toFixed(0) + 'h')
-      : '—';
-    return '<tr><td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + c.title + '</td>' +
-      '<td>' + (c.client || '—') + '</td>' +
-      '<td>' + (CAT_LABELS[c.category] || c.category || '—') + '</td>' +
-      '<td><span class="tag ' + c.status + '">' + (c.status === 'completed' ? 'Concluido' : 'Ativo') + '</span></td>' +
-      '<td style="font-size:12px;color:var(--t2)">' + ((c.assigned_names || []).join(', ') || '—') + '</td>' +
-      '<td style="font-family:JetBrains Mono;font-size:12px">' + timeStr + '</td></tr>';
-  }).join('');
-}
-
-function destroyChart(id) {
-  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
-}
-
-// ============ SETTINGS ============
-async function loadSettings() {
-  // Connection
-  var conn = await apiCall('/admin/trello-connection');
-  var connEl = document.getElementById('connStatus');
-  var connForm = document.getElementById('connForm');
-  if (conn && conn.trello_api_key) {
-    connEl.innerHTML = '<p style="color:var(--t2);font-size:13px">Conectado — ' + (conn.board_ids || []).length + ' board(s) — Token: ' + conn.trello_token + '</p>';
-    connForm.classList.add('hide');
-  } else {
-    connEl.innerHTML = '';
-    connForm.classList.remove('hide');
-  }
-
-  // Users
-  var users = await apiCall('/admin/users');
-  var tbody = document.getElementById('usersTable');
-  tbody.innerHTML = (users || []).map(function(u) {
-    return '<tr><td>' + u.name + '</td><td style="font-size:12px;color:var(--t2)">' + u.email + '</td>' +
-      '<td><span class="role-tag ' + u.role + '">' + u.role + '</span></td>' +
-      '<td style="font-size:12px">' + ((u.clients || []).join(', ') || '—') + '</td></tr>';
-  }).join('');
-}
-
-document.getElementById('connForm').onsubmit = async function(e) {
-  e.preventDefault();
-  await apiCall('/admin/trello-connection', { method: 'POST', body: JSON.stringify({
-    trello_api_key: document.getElementById('connKey').value,
-    trello_token: document.getElementById('connToken').value,
-    board_ids: document.getElementById('connBoards').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean),
-  })});
-  showToast('Trello conectado!', 'success');
-  loadSettings();
-};
-
-document.getElementById('addUserForm').onsubmit = async function(e) {
-  e.preventDefault();
-  await apiCall('/admin/users', { method: 'POST', body: JSON.stringify({
-    name: document.getElementById('newName').value,
-    email: document.getElementById('newEmail').value,
-    password: document.getElementById('newPass').value,
-    role: document.getElementById('newRole').value,
-  })});
-  document.getElementById('newName').value = '';
-  document.getElementById('newEmail').value = '';
-  document.getElementById('newPass').value = '';
-  showToast('Usuario criado!', 'success');
-  loadSettings();
-};
-
-async function syncNow() {
-  await apiCall('/admin/sync', { method: 'POST' });
-  showToast('Sincronizacao iniciada!', 'success');
-}
-
-// ============ UTILS ============
-function showToast(msg, type) {
-  var ex = document.querySelector('.toast');
-  if (ex) ex.remove();
-  var t = document.createElement('div');
-  t.className = 'toast ' + (type || '');
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(function() { t.remove(); }, 4000);
-}
-
-// ============ INIT ============
-sb.auth.getSession().then(function(res) {
-  if (res.data.session) initApp();
-  else showLogin();
-});
+document.getElementById('connForm').onsubmit=async function(e){e.preventDefault();await apiCall('/admin/trello-connection',{method:'POST',body:JSON.stringify({trello_api_key:document.getElementById('connKey').value,trello_token:document.getElementById('connToken').value,board_ids:document.getElementById('connBoards').value.split(',').map(function(s){return s.trim()}).filter(Boolean)})});showToast('Trello conectado!','success');loadSettings();};
+document.getElementById('addUserForm').onsubmit=async function(e){e.preventDefault();await apiCall('/admin/users',{method:'POST',body:JSON.stringify({name:document.getElementById('newName').value,email:document.getElementById('newEmail').value,password:document.getElementById('newPass').value,role:document.getElementById('newRole').value})});document.getElementById('newName').value='';document.getElementById('newEmail').value='';document.getElementById('newPass').value='';showToast('Usuario criado!','success');loadSettings();};
+async function syncNow(){await apiCall('/admin/sync',{method:'POST'});showToast('Sincronizacao iniciada!','success');}
+function showToast(m,t){var x=document.querySelector('.toast');if(x)x.remove();var e=document.createElement('div');e.className='toast '+(t||'');e.textContent=m;document.body.appendChild(e);setTimeout(function(){e.remove();},5000);}
+sb.auth.getSession().then(function(r){if(r.data.session)initApp();else showLogin();});
 </script>
 </body>
 </html>
