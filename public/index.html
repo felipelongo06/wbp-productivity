@@ -1,866 +1,466 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WBP Productivity</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
-  <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #06060b;
-      --s1: #0d0d15;
-      --s2: #14141f;
-      --s3: #1c1c2a;
-      --bd: #252538;
-      --t1: #f0f0f5;
-      --t2: #9898b0;
-      --t3: #5a5a72;
-      --ac: #4f46e5;
-      --ac2: #6366f1;
-      --ac-bg: rgba(99, 102, 241, .1);
-      --gn: #22c55e;
-      --gn-bg: rgba(34, 197, 94, .08);
-      --or: #f59e0b;
-      --or-bg: rgba(245, 158, 11, .08);
-      --rd: #ef4444;
-      --rd-bg: rgba(239, 68, 68, .08);
-      --bl: #3b82f6
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box
-    }
-
-    body {
-      font-family: 'Outfit', sans-serif;
-      background: var(--bg);
-      color: var(--t1);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased
-    }
-
-    ::-webkit-scrollbar {
-      width: 6px
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--bg)
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--bd);
-      border-radius: 3px
-    }
-
-    .login-page {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(ellipse at top, #14142a 0%, var(--bg) 70%)
-    }
-
-    .login-card {
-      background: var(--s1);
-      border: 1px solid var(--bd);
-      border-radius: 16px;
-      padding: 48px;
-      width: 380px;
-      text-align: center
-    }
-
-    .login-card h1 {
-      font-size: 28px;
-      font-weight: 800;
-      margin-bottom: 8px;
-      letter-spacing: -.02em
-    }
-
-    .login-card p {
-      color: var(--t2);
-      font-size: 14px;
-      margin-bottom: 32px
-    }
-
-    .input {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid var(--bd);
-      background: var(--s2);
-      color: var(--t1);
-      font-family: 'Outfit', sans-serif;
-      font-size: 14px;
-      margin-bottom: 12px;
-      outline: none;
-      transition: border-color .2s
-    }
-
-    .input:focus {
-      border-color: var(--ac)
-    }
-
-    .btn-primary {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      background: linear-gradient(135deg, var(--ac), var(--ac2));
-      color: #fff;
-      font-family: 'Outfit', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity .2s;
-      margin-top: 8px
-    }
-
-    .btn-primary:hover {
-      opacity: .9
-    }
-
-    .btn-primary:disabled {
-      opacity: .5
-    }
-
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 220px;
-      background: var(--s1);
-      border-right: 1px solid var(--bd);
-      padding: 24px 0;
-      display: flex;
-      flex-direction: column;
-      z-index: 50
-    }
-
-    .sidebar-brand {
-      padding: 0 24px;
-      margin-bottom: 32px;
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -.02em
-    }
-
-    .sidebar-brand span {
-      color: var(--ac2)
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 24px;
-      color: var(--t2);
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all .15s;
-      border-left: 3px solid transparent
-    }
-
-    .nav-item:hover {
-      color: var(--t1);
-      background: var(--s2)
-    }
-
-    .nav-item.active {
-      color: var(--ac2);
-      border-left-color: var(--ac2);
-      background: var(--ac-bg)
-    }
-
-    .nav-item .icon {
-      width: 20px;
-      text-align: center
-    }
-
-    .sidebar-footer {
-      margin-top: auto;
-      padding: 16px 24px;
-      border-top: 1px solid var(--bd)
-    }
-
-    .sidebar-footer .user-name {
-      font-size: 13px;
-      font-weight: 600
-    }
-
-    .sidebar-footer .user-role {
-      font-size: 11px;
-      color: var(--t3);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      margin-top: 2px
-    }
-
-    .sidebar-footer .logout {
-      color: var(--rd);
-      font-size: 12px;
-      cursor: pointer;
-      margin-top: 8px;
-      background: none;
-      border: none;
-      font-family: 'Outfit';
-      padding: 0
-    }
-
-    .main {
-      margin-left: 220px;
-      padding: 32px;
-      min-height: 100vh
-    }
-
-    .page-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 28px;
-      flex-wrap: wrap;
-      gap: 12px
-    }
-
-    .page-title {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -.02em
-    }
-
-    .period-select {
-      display: flex;
-      gap: 4px;
-      background: var(--s2);
-      border-radius: 8px;
-      padding: 3px
-    }
-
-    .period-btn {
-      padding: 6px 14px;
-      border-radius: 6px;
-      border: none;
-      background: transparent;
-      color: var(--t2);
-      font-family: 'Outfit';
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all .15s
-    }
-
-    .period-btn.active {
-      background: var(--ac);
-      color: #fff
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 28px
-    }
-
-    .stat {
-      background: var(--s1);
-      border: 1px solid var(--bd);
-      border-radius: 12px;
-      padding: 20px
-    }
-
-    .stat .label {
-      font-size: 12px;
-      color: var(--t3);
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      margin-bottom: 8px;
-      font-weight: 500
-    }
-
-    .stat .value {
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: -.03em
-    }
-
-    .stat .subtitle {
-      font-size: 12px;
-      color: var(--t2);
-      margin-top: 4px
-    }
-
-    .chart-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 28px
-    }
-
-    .chart-card {
-      background: var(--s1);
-      border: 1px solid var(--bd);
-      border-radius: 12px;
-      padding: 20px
-    }
-
-    .chart-card.full {
-      grid-column: 1/-1
-    }
-
-    .chart-title {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between
-    }
-
-    .table-card {
-      background: var(--s1);
-      border: 1px solid var(--bd);
-      border-radius: 12px;
-      overflow: hidden
-    }
-
-    .table-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--bd);
-      font-weight: 600;
-      font-size: 15px
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse
-    }
-
-    th {
-      text-align: left;
-      padding: 10px 16px;
-      font-size: 12px;
-      color: var(--t3);
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      font-weight: 500;
-      border-bottom: 1px solid var(--bd)
-    }
-
-    td {
-      padding: 10px 16px;
-      font-size: 13px;
-      border-bottom: 1px solid rgba(37, 37, 56, .5)
-    }
-
-    tr:hover {
-      background: var(--s2)
-    }
-
-    .tag {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase
-    }
-
-    .tag.active {
-      background: var(--bl);
-      background: rgba(59, 130, 246, .15);
-      color: var(--bl)
-    }
-
-    .tag.completed {
-      background: var(--gn-bg);
-      color: var(--gn)
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 14px;
-      background: var(--s2);
-      border: 1px solid var(--bd);
-      z-index: 1000;
-      animation: slideUp .3s
-    }
-
-    .toast.error {
-      border-color: var(--rd);
-      color: var(--rd)
-    }
-
-    .toast.success {
-      border-color: var(--gn);
-      color: var(--gn)
-    }
-
-    @keyframes slideUp {
-      from {
-        transform: translateY(20px);
-        opacity: 0
-      }
-
-      to {
-        transform: translateY(0);
-        opacity: 1
-      }
-    }
-
-    .empty {
-      text-align: center;
-      padding: 48px;
-      color: var(--t3)
-    }
-
-    .settings-form {
-      max-width: 600px
-    }
-
-    .settings-form .group {
-      margin-bottom: 20px
-    }
-
-    .settings-form label {
-      display: block;
-      font-size: 13px;
-      color: var(--t2);
-      margin-bottom: 6px
-    }
-
-    .settings-form .input {
-      margin-bottom: 0
-    }
-
-    .btn {
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: 1px solid var(--bd);
-      background: var(--s2);
-      color: var(--t1);
-      font-family: 'Outfit';
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer
-    }
-
-    .btn:hover {
-      background: var(--s3)
-    }
-
-    .user-table .role {
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase
-    }
-
-    .role.gestao {
-      background: rgba(239, 68, 68, .1);
-      color: var(--rd)
-    }
-
-    .role.cs {
-      background: rgba(245, 158, 11, .1);
-      color: var(--or)
-    }
-
-    .role.operacao {
-      background: rgba(59, 130, 246, .1);
-      color: var(--bl)
-    }
-
-    @media(max-width:1024px) {
-      .sidebar {
-        display: none
-      }
-
-      .main {
-        margin-left: 0
-      }
-
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr)
-      }
-
-      .chart-grid {
-        grid-template-columns: 1fr
-      }
-    }
-
-    .cat-label {
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px
-    }
-
-    .cat-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      display: inline-block
-    }
+    :root{--bg:#06060b;--s1:#0d0d15;--s2:#14141f;--s3:#1c1c2a;--bd:#252538;--t1:#f0f0f5;--t2:#9898b0;--t3:#5a5a72;--ac:#6366f1;--ac2:#818cf8;--gn:#22c55e;--or:#f59e0b;--rd:#ef4444;--bl:#3b82f6}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;-webkit-font-smoothing:antialiased}
+    .hide{display:none!important}
+
+    /* Login */
+    .login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at top,#14142a 0%,var(--bg) 70%)}
+    .login-card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:48px;width:380px;text-align:center}
+    .login-card h1{font-size:28px;font-weight:800;margin-bottom:8px;letter-spacing:-.02em}
+    .login-card h1 span{color:var(--ac2)}
+    .login-card p{color:var(--t2);font-size:14px;margin-bottom:32px}
+    .input{width:100%;padding:12px 16px;border-radius:10px;border:1px solid var(--bd);background:var(--s2);color:var(--t1);font-family:'Outfit',sans-serif;font-size:14px;margin-bottom:12px;outline:none;transition:border-color .2s}
+    .input:focus{border-color:var(--ac)}
+    .btn-primary{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#4f46e5,var(--ac));color:#fff;font-family:'Outfit';font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}
+    .btn-primary:hover{opacity:.9}.btn-primary:disabled{opacity:.5}
+    .error-msg{color:var(--rd);font-size:13px;margin-bottom:8px}
+
+    /* Layout */
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--s1);border-right:1px solid var(--bd);padding:24px 0;display:flex;flex-direction:column;z-index:50}
+    .sidebar-brand{padding:0 24px;margin-bottom:32px;font-size:18px;font-weight:800;letter-spacing:-.02em}
+    .sidebar-brand span{color:var(--ac2)}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 24px;color:var(--t2);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+    .nav-item:hover{color:var(--t1);background:var(--s2)}
+    .nav-item.active{color:var(--ac2);border-left-color:var(--ac2);background:rgba(99,102,241,.08)}
+    .sidebar-footer{margin-top:auto;padding:16px 24px;border-top:1px solid var(--bd)}
+    .sidebar-footer .name{font-size:13px;font-weight:600}
+    .sidebar-footer .role{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+    .sidebar-footer .logout{color:var(--rd);font-size:12px;cursor:pointer;margin-top:8px;background:none;border:none;font-family:'Outfit';padding:0}
+    .main{margin-left:220px;padding:32px;min-height:100vh}
+
+    .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+    .page-title{font-size:24px;font-weight:700;letter-spacing:-.02em}
+    .period-bar{display:flex;gap:4px;background:var(--s2);border-radius:8px;padding:3px}
+    .period-btn{padding:6px 14px;border-radius:6px;border:none;background:transparent;color:var(--t2);font-family:'Outfit';font-size:13px;font-weight:500;cursor:pointer}
+    .period-btn.active{background:var(--ac);color:#fff}
+
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+    .stat{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px}
+    .stat .label{font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;font-weight:500}
+    .stat .value{font-size:32px;font-weight:700;letter-spacing:-.03em}
+    .stat .sub{font-size:12px;color:var(--t2);margin-top:4px}
+
+    .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
+    .chart-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px}
+    .chart-card.full{grid-column:1/-1}
+    .chart-title{font-size:15px;font-weight:600;margin-bottom:16px}
+
+    .table-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:28px}
+    .table-header{padding:16px 20px;border-bottom:1px solid var(--bd);font-weight:600;font-size:15px}
+    table{width:100%;border-collapse:collapse}
+    th{text-align:left;padding:10px 16px;font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;font-weight:500;border-bottom:1px solid var(--bd)}
+    td{padding:10px 16px;font-size:13px;border-bottom:1px solid rgba(37,37,56,.5)}
+    tr:hover td{background:var(--s2)}
+    .tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+    .tag.active{background:rgba(59,130,246,.15);color:var(--bl)}
+    .tag.completed{background:rgba(34,197,94,.08);color:var(--gn)}
+
+    .settings-section{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
+    .settings-section h3{font-size:15px;font-weight:600;margin-bottom:16px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    .form-group{display:flex;flex-direction:column;gap:4px}
+    .form-group label{font-size:13px;color:var(--t2)}
+    .btn{padding:8px 16px;border-radius:8px;border:1px solid var(--bd);background:var(--s2);color:var(--t1);font-family:'Outfit';font-size:13px;font-weight:500;cursor:pointer}
+    .btn:hover{background:var(--s3)}.btn.sm{padding:5px 10px;font-size:12px}
+    .role-tag{padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase}
+    .role-tag.gestao{background:rgba(239,68,68,.1);color:var(--rd)}
+    .role-tag.cs{background:rgba(245,158,11,.1);color:var(--or)}
+    .role-tag.operacao{background:rgba(59,130,246,.1);color:var(--bl)}
+
+    .empty{text-align:center;padding:48px;color:var(--t3)}
+    .toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-size:14px;background:var(--s2);border:1px solid var(--bd);z-index:1000;animation:slideUp .3s}
+    .toast.success{border-color:var(--gn);color:var(--gn)}.toast.error{border-color:var(--rd);color:var(--rd)}
+    @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+    @media(max-width:1024px){.sidebar{display:none}.main{margin-left:0}.stats-grid,.form-row{grid-template-columns:repeat(2,1fr)}.chart-grid{grid-template-columns:1fr}}
   </style>
 </head>
-
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState, useEffect, useCallback } = React;
-    const { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } = Recharts;
 
-    // Config - SUBSTITUIR com seus valores do Supabase
-    const SUPABASE_URL = 'https://ciggioucwilhqpuxtzue.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZ2dpb3Vjd2lsaHFwdXh0enVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MDY2MDAsImV4cCI6MjA5MzA4MjYwMH0.1JzEq9IrOPNgwr4NYiQYrVPPOTmneobPJYCvkEN8BSw';
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="login-page">
+  <div class="login-card">
+    <h1>WBP <span>Productivity</span></h1>
+    <p>Mensure a produtividade da sua equipe</p>
+    <form id="loginForm">
+      <input class="input" type="email" id="loginEmail" placeholder="Email" required />
+      <input class="input" type="password" id="loginPass" placeholder="Senha" required />
+      <div id="loginError" class="error-msg hide"></div>
+      <button class="btn-primary" type="submit" id="loginBtn">Entrar</button>
+    </form>
+  </div>
+</div>
 
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    const API = window.location.origin;
+<!-- APP -->
+<div id="appPage" class="hide">
+  <div class="sidebar">
+    <div class="sidebar-brand">WBP <span>Prod</span></div>
+    <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">📊 Dashboard</div>
+    <div class="nav-item" onclick="showPage('settings')" id="nav-settings" style="display:none">⚙️ Configuracoes</div>
+    <div class="sidebar-footer">
+      <div class="name" id="userName"></div>
+      <div class="role" id="userRole"></div>
+      <button class="logout" onclick="logout()">Sair</button>
+    </div>
+  </div>
 
-    const COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899', '#14b8a6', '#8b5cf6'];
-    const CAT_LABELS = {
-      midia_paga: 'Midia Paga', social_media: 'Social Media', crm: 'CRM', ai_automacao: 'AI/Automacao',
-      tracking_dados: 'Tracking/Dados', estrategia: 'Estrategia', criacao: 'Criacao', operacional: 'Operacional', sem_categoria: 'Sem categoria'
-    };
-
-    // ========== API HELPERS ==========
-    async function api(path, opts) {
-      const session = (await sb.auth.getSession()).data.session;
-      if (!session) throw new Error('Nao autenticado');
-      const res = await fetch(API + '/api' + path, {
-        ...opts, headers: { 'Authorization': 'Bearer ' + session.access_token, 'Content-Type': 'application/json', ...(opts?.headers || {}) }
-      });
-      return res.json();
-    }
-
-    // ========== LOGIN ==========
-    function LoginPage({ onLogin }) {
-      const [email, setEmail] = useState('');
-      const [pass, setPass] = useState('');
-      const [loading, setLoading] = useState(false);
-      const [error, setError] = useState('');
-
-      async function handleLogin(e) {
-        e.preventDefault(); setLoading(true); setError('');
-        const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-        if (error) { setError(error.message); setLoading(false); }
-        else onLogin();
-      }
-
-      return (
-        <div className="login-page">
-          <div className="login-card">
-            <h1>WBP <span style={{ color: 'var(--ac2)' }}>Productivity</span></h1>
-            <p>Mensure a produtividade da sua equipe</p>
-            <form onSubmit={handleLogin}>
-              <input className="input" type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-              <input className="input" type="password" placeholder="Senha" value={pass} onChange={e => setPass(e.target.value)} />
-              {error && <p style={{ color: 'var(--rd)', fontSize: '13px', marginBottom: 8 }}>{error}</p>}
-              <button className="btn-primary" disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
-            </form>
-          </div>
+  <div class="main">
+    <!-- DASHBOARD -->
+    <div id="page-dashboard">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <div class="period-bar">
+          <button class="period-btn" onclick="setPeriod(7)">7d</button>
+          <button class="period-btn" onclick="setPeriod(14)">14d</button>
+          <button class="period-btn active" onclick="setPeriod(30)">30d</button>
+          <button class="period-btn" onclick="setPeriod(90)">90d</button>
         </div>
-      );
-    }
+      </div>
 
-    // ========== DASHBOARD ==========
-    function Dashboard({ user }) {
-      const [period, setPeriod] = useState(30);
-      const [overview, setOverview] = useState(null);
-      const [byClient, setByClient] = useState([]);
-      const [byCategory, setByCategory] = useState([]);
-      const [byPerson, setByPerson] = useState([]);
-      const [timeline, setTimeline] = useState([]);
-      const [recentCards, setRecentCards] = useState([]);
+      <div class="stats-grid">
+        <div class="stat"><div class="label">Cards ativos</div><div class="value" id="statActive">-</div></div>
+        <div class="stat"><div class="label">Criados</div><div class="value" id="statCreated">-</div></div>
+        <div class="stat"><div class="label">Concluidos</div><div class="value" id="statCompleted">-</div></div>
+        <div class="stat"><div class="label">Tempo medio</div><div class="value" id="statAvg">-</div><div class="sub">para conclusao</div></div>
+      </div>
 
-      const load = useCallback(async () => {
-        const [ov, cl, cat, per, tl, rc] = await Promise.all([
-          api('/metrics/overview?days=' + period),
-          api('/metrics/by-client?days=' + period),
-          api('/metrics/by-category?days=' + period),
-          api('/metrics/by-person?days=' + period),
-          api('/metrics/timeline?days=' + period),
-          api('/metrics/recent-cards?limit=15'),
-        ]);
-        setOverview(ov); setByClient(cl); setByCategory(cat); setByPerson(per); setTimeline(tl); setRecentCards(rc);
-      }, [period]);
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-title">Por Cliente</div><canvas id="chartClient"></canvas></div>
+        <div class="chart-card"><div class="chart-title">Por Categoria</div><canvas id="chartCategory"></canvas></div>
+        <div class="chart-card full"><div class="chart-title">Criados vs Concluidos por Semana</div><canvas id="chartTimeline" height="80"></canvas></div>
+        <div class="chart-card full" id="personChartWrap"><div class="chart-title">Performance por Pessoa</div><canvas id="chartPerson" height="80"></canvas></div>
+      </div>
 
-      useEffect(() => { load(); }, [load]);
+      <div class="table-card">
+        <div class="table-header">Cards Recentes</div>
+        <table><thead><tr><th>Card</th><th>Cliente</th><th>Categoria</th><th>Status</th><th>Atribuido</th><th>Tempo</th></tr></thead>
+        <tbody id="recentTable"></tbody></table>
+      </div>
+    </div>
 
-      if (!overview) return <div className="empty">Carregando...</div>;
+    <!-- SETTINGS -->
+    <div id="page-settings" class="hide">
+      <h1 class="page-title" style="margin-bottom:28px">Configuracoes</h1>
 
-      const avgDays = overview.avgCompletionHours > 24
-        ? (overview.avgCompletionHours / 24).toFixed(1) + ' dias'
-        : overview.avgCompletionHours + 'h';
+      <div class="settings-section">
+        <h3>Conexao Trello <button class="btn sm" onclick="syncNow()" style="float:right">Sync agora</button></h3>
+        <div id="connStatus"></div>
+        <form id="connForm" class="hide">
+          <div class="form-row">
+            <div class="form-group"><label>Trello API Key</label><input class="input" id="connKey" /></div>
+            <div class="form-group"><label>Trello Token</label><input class="input" id="connToken" /></div>
+          </div>
+          <div class="form-group" style="margin-bottom:12px"><label>Board IDs (separados por virgula)</label><input class="input" id="connBoards" /></div>
+          <button class="btn-primary" type="submit" style="width:auto;padding:10px 24px">Conectar</button>
+        </form>
+      </div>
 
-      return (
-        <div>
-          <div className="page-header">
-            <h1 className="page-title">Dashboard</h1>
-            <div className="period-select">
-              {[7, 14, 30, 90].map(d => <button key={d} className={'period-btn' + (period === d ? ' active' : '')} onClick={() => setPeriod(d)}>{d}d</button>)}
+      <div class="settings-section">
+        <h3>Adicionar Usuario</h3>
+        <form id="addUserForm">
+          <div class="form-row">
+            <div class="form-group"><label>Nome</label><input class="input" id="newName" required /></div>
+            <div class="form-group"><label>Email</label><input class="input" type="email" id="newEmail" required /></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Senha inicial</label><input class="input" id="newPass" required /></div>
+            <div class="form-group"><label>Role</label>
+              <select class="input" id="newRole"><option value="operacao">Operacao</option><option value="cs">CS</option><option value="gestao">Gestao</option></select>
             </div>
           </div>
+          <button class="btn-primary" type="submit" style="width:auto;padding:10px 24px">Criar Usuario</button>
+        </form>
+      </div>
 
-          <div className="stats-grid">
-            <div className="stat"><div className="label">Cards ativos</div><div className="value">{overview.activeCards}</div></div>
-            <div className="stat"><div className="label">Criados ({period}d)</div><div className="value">{overview.createdCards}</div></div>
-            <div className="stat"><div className="label">Concluidos ({period}d)</div><div className="value">{overview.completedCards}</div></div>
-            <div className="stat"><div className="label">Tempo medio</div><div className="value">{avgDays}</div><div className="subtitle">para conclusao</div></div>
-          </div>
+      <div class="table-card">
+        <div class="table-header">Usuarios</div>
+        <table><thead><tr><th>Nome</th><th>Email</th><th>Role</th><th>Clientes</th></tr></thead>
+        <tbody id="usersTable"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
 
-          <div className="chart-grid">
-            <div className="chart-card">
-              <div className="chart-title">Por Cliente</div>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={byClient} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#252538" />
-                  <XAxis type="number" stroke="#5a5a72" fontSize={11} />
-                  <YAxis type="category" dataKey="client" width={100} stroke="#5a5a72" fontSize={11} />
-                  <Tooltip contentStyle={{ background: '#14141f', border: '1px solid #252538', borderRadius: 8, fontSize: 12 }} />
-                  <Bar dataKey="completed" name="Concluidos" fill="#22c55e" radius={[0, 4, 4, 0]} />
-                  <Bar dataKey="active" name="Ativos" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+<script>
+// ============ CONFIG ============
+var SUPABASE_URL = 'https://ciggioucwilhqpuxtzue.supabase.co';
+var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZ2dpb3Vjd2lsaHFwdXh0enVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MDY2MDAsImV4cCI6MjA5MzA4MjYwMH0.1JzEq9IrOPNgwr4NYiQYrVPPOTmneobPJYCvkEN8BSw';
 
-            <div className="chart-card">
-              <div className="chart-title">Por Categoria</div>
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie data={byCategory.map((c, i) => ({ ...c, name: CAT_LABELS[c.category] || c.category }))} dataKey="total" nameKey="name" cx="50%" cy="50%" outerRadius={90} label={({ name, percent }) => name + ' ' + (percent * 100).toFixed(0) + '%'} labelLine={false} fontSize={11}>
-                    {byCategory.map((c, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ background: '#14141f', border: '1px solid #252538', borderRadius: 8, fontSize: 12 }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+var API = window.location.origin;
+var currentUser = null;
+var currentPeriod = 30;
+var charts = {};
 
-            <div className="chart-card full">
-              <div className="chart-title">Criados vs Concluidos por Semana</div>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={timeline}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#252538" />
-                  <XAxis dataKey="week" stroke="#5a5a72" fontSize={11} tickFormatter={w => { var d = new Date(w); return (d.getDate()) + '/' + (d.getMonth() + 1); }} />
-                  <YAxis stroke="#5a5a72" fontSize={11} />
-                  <Tooltip contentStyle={{ background: '#14141f', border: '1px solid #252538', borderRadius: 8, fontSize: 12 }} />
-                  <Line type="monotone" dataKey="created" name="Criados" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} />
-                  <Line type="monotone" dataKey="completed" name="Concluidos" stroke="#22c55e" strokeWidth={2} dot={{ r: 3 }} />
-                  <Legend />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+var CAT_LABELS = {
+  midia_paga:'Midia Paga', social_media:'Social Media', crm:'CRM', ai_automacao:'AI/Automacao',
+  tracking_dados:'Tracking/Dados', estrategia:'Estrategia', criacao:'Criacao', operacional:'Operacional', sem_categoria:'Sem categoria'
+};
+var COLORS = ['#6366f1','#22c55e','#f59e0b','#ef4444','#3b82f6','#ec4899','#14b8a6','#8b5cf6','#f97316','#06b6d4'];
 
-            {user.role !== 'operacao' && (
-              <div className="chart-card full">
-                <div className="chart-title">Performance por Pessoa</div>
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={byPerson}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#252538" />
-                    <XAxis dataKey="name" stroke="#5a5a72" fontSize={11} />
-                    <YAxis stroke="#5a5a72" fontSize={11} />
-                    <Tooltip contentStyle={{ background: '#14141f', border: '1px solid #252538', borderRadius: 8, fontSize: 12 }} />
-                    <Bar dataKey="completed" name="Concluidos" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="active" name="Ativos" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </div>
+Chart.defaults.color = '#9898b0';
+Chart.defaults.borderColor = '#252538';
+Chart.defaults.font.family = 'Outfit';
 
-          <div className="table-card">
-            <div className="table-header">Cards Recentes</div>
-            <table>
-              <thead><tr><th>Card</th><th>Cliente</th><th>Categoria</th><th>Status</th><th>Atribuido</th><th>Tempo</th></tr></thead>
-              <tbody>
-                {recentCards.map((c, i) => (
-                  <tr key={i}>
-                    <td style={{ maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.title}</td>
-                    <td>{c.client || '—'}</td>
-                    <td><span className="cat-label"><span className="cat-dot" style={{ background: COLORS[Object.keys(CAT_LABELS).indexOf(c.category) % COLORS.length] || '#666' }}></span>{CAT_LABELS[c.category] || c.category || '—'}</span></td>
-                    <td><span className={'tag ' + c.status}>{c.status === 'completed' ? 'Concluido' : 'Ativo'}</span></td>
-                    <td style={{ fontSize: 12, color: 'var(--t2)' }}>{(c.assigned_names || []).join(', ') || '—'}</td>
-                    <td style={{ fontFamily: 'JetBrains Mono', fontSize: 12 }}>{c.time_to_complete_hours ? (c.time_to_complete_hours > 24 ? (c.time_to_complete_hours / 24).toFixed(1) + 'd' : c.time_to_complete_hours.toFixed(0) + 'h') : '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      );
-    }
+// ============ AUTH ============
+async function apiCall(path, opts) {
+  var session = (await sb.auth.getSession()).data.session;
+  if (!session) throw new Error('Nao autenticado');
+  var res = await fetch(API + '/api' + path, {
+    ...opts,
+    headers: { 'Authorization':'Bearer ' + session.access_token, 'Content-Type':'application/json', ...(opts?.headers||{}) }
+  });
+  return res.json();
+}
 
-    // ========== SETTINGS (gestao only) ==========
-    function Settings({ user }) {
-      const [users, setUsers] = useState([]);
-      const [conn, setConn] = useState(null);
-      const [newUser, setNewUser] = useState({ email: '', name: '', role: 'operacao', password: '' });
-      const [trelloKey, setTrelloKey] = useState('');
-      const [trelloToken, setTrelloToken] = useState('');
-      const [boardIds, setBoardIds] = useState('');
+document.getElementById('loginForm').onsubmit = async function(e) {
+  e.preventDefault();
+  var btn = document.getElementById('loginBtn');
+  var errEl = document.getElementById('loginError');
+  btn.disabled = true; errEl.classList.add('hide');
 
-      useEffect(() => {
-        if (user.role === 'gestao') {
-          api('/admin/users').then(setUsers);
-          api('/admin/trello-connection').then(setConn);
-        }
-      }, [user.role]);
+  var { error } = await sb.auth.signInWithPassword({
+    email: document.getElementById('loginEmail').value,
+    password: document.getElementById('loginPass').value,
+  });
 
-      async function addUser(e) {
-        e.preventDefault();
-        await api('/admin/users', { method: 'POST', body: JSON.stringify(newUser) });
-        setNewUser({ email: '', name: '', role: 'operacao', password: '' });
-        api('/admin/users').then(setUsers);
-      }
+  if (error) { errEl.textContent = error.message; errEl.classList.remove('hide'); btn.disabled = false; }
+  else { await initApp(); }
+};
 
-      async function saveConnection(e) {
-        e.preventDefault();
-        var ids = boardIds.split(',').map(s => s.trim()).filter(Boolean);
-        await api('/admin/trello-connection', { method: 'POST', body: JSON.stringify({ trello_api_key: trelloKey, trello_token: trelloToken, board_ids: ids }) });
-        api('/admin/trello-connection').then(setConn);
-      }
+async function initApp() {
+  var session = (await sb.auth.getSession()).data.session;
+  if (!session) { showLogin(); return; }
 
-      async function syncNow() { await api('/admin/sync', { method: 'POST' }); }
+  try {
+    currentUser = await apiCall('/admin/me');
+  } catch(e) {
+    showLogin(); return;
+  }
 
-      if (user.role !== 'gestao') return <div className="empty">Acesso restrito a Gestao</div>;
+  document.getElementById('loginPage').classList.add('hide');
+  document.getElementById('appPage').classList.remove('hide');
+  document.getElementById('userName').textContent = currentUser.name;
+  document.getElementById('userRole').textContent = currentUser.role;
 
-      return (
-        <div>
-          <h1 className="page-title" style={{ marginBottom: 28 }}>Configuracoes</h1>
+  if (currentUser.role === 'gestao') {
+    document.getElementById('nav-settings').style.display = '';
+  }
+  if (currentUser.role === 'operacao') {
+    document.getElementById('personChartWrap').style.display = 'none';
+  }
 
-          <div className="chart-card" style={{ marginBottom: 20 }}>
-            <div className="chart-title">Conexao Trello <button className="btn" onClick={syncNow} style={{ fontSize: 12 }}>Sync agora</button></div>
-            {conn ? (
-              <p style={{ fontSize: 13, color: 'var(--t2)' }}>Conectado — {(conn.board_ids || []).length} board(s) — Token: {conn.trello_token}</p>
-            ) : (
-              <form onSubmit={saveConnection} className="settings-form">
-                <div className="group"><label>Trello API Key</label><input className="input" value={trelloKey} onChange={e => setTrelloKey(e.target.value)} /></div>
-                <div className="group"><label>Trello Token</label><input className="input" value={trelloToken} onChange={e => setTrelloToken(e.target.value)} /></div>
-                <div className="group"><label>Board IDs (separados por virgula)</label><input className="input" value={boardIds} onChange={e => setBoardIds(e.target.value)} /></div>
-                <button className="btn-primary" style={{ width: 'auto', padding: '10px 24px' }}>Conectar</button>
-              </form>
-            )}
-          </div>
+  loadDashboard();
+}
 
-          <div className="chart-card" style={{ marginBottom: 20 }}>
-            <div className="chart-title">Adicionar Usuario</div>
-            <form onSubmit={addUser} className="settings-form">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div className="group"><label>Nome</label><input className="input" value={newUser.name} onChange={e => setNewUser({ ...newUser, name: e.target.value })} /></div>
-                <div className="group"><label>Email</label><input className="input" type="email" value={newUser.email} onChange={e => setNewUser({ ...newUser, email: e.target.value })} /></div>
-                <div className="group"><label>Senha inicial</label><input className="input" value={newUser.password} onChange={e => setNewUser({ ...newUser, password: e.target.value })} /></div>
-                <div className="group"><label>Role</label>
-                  <select className="input" value={newUser.role} onChange={e => setNewUser({ ...newUser, role: e.target.value })}>
-                    <option value="operacao">Operacao</option><option value="cs">CS</option><option value="gestao">Gestao</option>
-                  </select>
-                </div>
-              </div>
-              <button className="btn-primary" style={{ width: 'auto', padding: '10px 24px', marginTop: 8 }}>Criar Usuario</button>
-            </form>
-          </div>
+function showLogin() {
+  document.getElementById('loginPage').classList.remove('hide');
+  document.getElementById('appPage').classList.add('hide');
+  document.getElementById('loginBtn').disabled = false;
+}
 
-          <div className="table-card">
-            <div className="table-header">Usuarios</div>
-            <table className="user-table">
-              <thead><tr><th>Nome</th><th>Email</th><th>Role</th><th>Clientes</th><th>Trello ID</th></tr></thead>
-              <tbody>
-                {users.map(u => (
-                  <tr key={u.id}>
-                    <td>{u.name}</td>
-                    <td style={{ fontSize: 12, color: 'var(--t2)' }}>{u.email}</td>
-                    <td><span className={'role ' + u.role}>{u.role}</span></td>
-                    <td style={{ fontSize: 12 }}>{(u.clients || []).join(', ') || '—'}</td>
-                    <td style={{ fontSize: 11, fontFamily: 'JetBrains Mono', color: 'var(--t3)' }}>{u.trello_member_id || '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      );
-    }
+async function logout() {
+  await sb.auth.signOut();
+  currentUser = null;
+  showLogin();
+}
 
-    // ========== APP ==========
-    function App() {
-      const [session, setSession] = useState(null);
-      const [user, setUser] = useState(null);
-      const [page, setPage] = useState('dashboard');
-      const [loading, setLoading] = useState(true);
+// ============ NAVIGATION ============
+function showPage(page) {
+  document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('nav-' + page).classList.add('active');
+  document.getElementById('page-dashboard').classList.add('hide');
+  document.getElementById('page-settings').classList.add('hide');
+  document.getElementById('page-' + page).classList.remove('hide');
 
-      useEffect(() => {
-        sb.auth.getSession().then(({ data }) => {
-          setSession(data.session);
-          if (data.session) loadUser();
-          else setLoading(false);
-        });
-        sb.auth.onAuthStateChange((ev, sess) => {
-          setSession(sess);
-          if (sess) loadUser();
-          else { setUser(null); setLoading(false); }
-        });
-      }, []);
+  if (page === 'settings') loadSettings();
+}
 
-      async function loadUser() {
-        try {
-          const u = await api('/admin/me');
-          setUser(u);
-        } catch (e) { console.error(e); }
-        setLoading(false);
-      }
+function setPeriod(d) {
+  currentPeriod = d;
+  document.querySelectorAll('.period-btn').forEach(function(b) { b.classList.remove('active'); });
+  event.target.classList.add('active');
+  loadDashboard();
+}
 
-      async function logout() { await sb.auth.signOut(); setUser(null); setSession(null); }
+// ============ DASHBOARD ============
+async function loadDashboard() {
+  var [ov, cl, cat, per, tl, rc] = await Promise.all([
+    apiCall('/metrics/overview?days=' + currentPeriod),
+    apiCall('/metrics/by-client?days=' + currentPeriod),
+    apiCall('/metrics/by-category?days=' + currentPeriod),
+    apiCall('/metrics/by-person?days=' + currentPeriod),
+    apiCall('/metrics/timeline?days=' + currentPeriod),
+    apiCall('/metrics/recent-cards?limit=15'),
+  ]);
 
-      if (loading) return <div className="login-page"><div style={{ color: 'var(--t2)' }}>Carregando...</div></div>;
-      if (!session) return <LoginPage onLogin={loadUser} />;
-      if (!user) return <div className="login-page"><div className="login-card"><p>Seu usuario ainda nao foi cadastrado no sistema. Peca ao gestor para adicionar seu email.</p><button className="btn" onClick={logout} style={{ marginTop: 16 }}>Voltar</button></div></div>;
+  // Stats
+  document.getElementById('statActive').textContent = ov.activeCards || 0;
+  document.getElementById('statCreated').textContent = ov.createdCards || 0;
+  document.getElementById('statCompleted').textContent = ov.completedCards || 0;
+  var avgText = ov.avgCompletionHours > 24
+    ? (ov.avgCompletionHours / 24).toFixed(1) + 'd'
+    : (ov.avgCompletionHours || 0) + 'h';
+  document.getElementById('statAvg').textContent = avgText;
 
-      const navItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-        user.role === 'gestao' ? { id: 'settings', label: 'Configuracoes', icon: '⚙️' } : null,
-      ].filter(Boolean);
+  // Client chart
+  destroyChart('chartClient');
+  charts.chartClient = new Chart(document.getElementById('chartClient'), {
+    type: 'bar',
+    data: {
+      labels: cl.map(function(c) { return c.client; }),
+      datasets: [
+        { label: 'Concluidos', data: cl.map(function(c) { return c.completed; }), backgroundColor: '#22c55e' },
+        { label: 'Ativos', data: cl.map(function(c) { return c.active; }), backgroundColor: '#3b82f6' },
+      ]
+    },
+    options: { indexAxis: 'y', responsive: true, plugins: { legend: { position: 'bottom' } },
+      scales: { x: { grid: { color: '#1c1c2a' } }, y: { grid: { display: false } } } }
+  });
 
-      return (
-        <div>
-          <div className="sidebar">
-            <div className="sidebar-brand">WBP <span>Prod</span></div>
-            {navItems.map(n => (
-              <div key={n.id} className={'nav-item' + (page === n.id ? ' active' : '')} onClick={() => setPage(n.id)}>
-                <span className="icon">{n.icon}</span>{n.label}
-              </div>
-            ))}
-            <div className="sidebar-footer">
-              <div className="user-name">{user.name}</div>
-              <div className="user-role">{user.role}</div>
-              <button className="logout" onClick={logout}>Sair</button>
-            </div>
-          </div>
-          <div className="main">
-            {page === 'dashboard' && <Dashboard user={user} />}
-            {page === 'settings' && <Settings user={user} />}
-          </div>
-        </div>
-      );
-    }
+  // Category chart
+  destroyChart('chartCategory');
+  charts.chartCategory = new Chart(document.getElementById('chartCategory'), {
+    type: 'doughnut',
+    data: {
+      labels: cat.map(function(c) { return CAT_LABELS[c.category] || c.category; }),
+      datasets: [{ data: cat.map(function(c) { return c.total; }), backgroundColor: COLORS.slice(0, cat.length) }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { padding: 12, font: { size: 11 } } } } }
+  });
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-  </script>
+  // Timeline chart
+  destroyChart('chartTimeline');
+  charts.chartTimeline = new Chart(document.getElementById('chartTimeline'), {
+    type: 'line',
+    data: {
+      labels: tl.map(function(t) { var d = new Date(t.week); return d.getDate() + '/' + (d.getMonth()+1); }),
+      datasets: [
+        { label: 'Criados', data: tl.map(function(t) { return t.created; }), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,.1)', fill: true, tension: .3 },
+        { label: 'Concluidos', data: tl.map(function(t) { return t.completed; }), borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,.1)', fill: true, tension: .3 },
+      ]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } },
+      scales: { x: { grid: { color: '#1c1c2a' } }, y: { grid: { color: '#1c1c2a' }, beginAtZero: true } } }
+  });
+
+  // Person chart
+  if (currentUser.role !== 'operacao') {
+    destroyChart('chartPerson');
+    charts.chartPerson = new Chart(document.getElementById('chartPerson'), {
+      type: 'bar',
+      data: {
+        labels: per.map(function(p) { return p.name; }),
+        datasets: [
+          { label: 'Concluidos', data: per.map(function(p) { return p.completed; }), backgroundColor: '#22c55e' },
+          { label: 'Ativos', data: per.map(function(p) { return p.active; }), backgroundColor: '#3b82f6' },
+        ]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } },
+        scales: { x: { grid: { display: false } }, y: { grid: { color: '#1c1c2a' }, beginAtZero: true } } }
+    });
+  }
+
+  // Recent cards table
+  var tbody = document.getElementById('recentTable');
+  tbody.innerHTML = (rc || []).map(function(c) {
+    var timeStr = c.time_to_complete_hours
+      ? (c.time_to_complete_hours > 24 ? (c.time_to_complete_hours/24).toFixed(1) + 'd' : c.time_to_complete_hours.toFixed(0) + 'h')
+      : '—';
+    return '<tr><td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + c.title + '</td>' +
+      '<td>' + (c.client || '—') + '</td>' +
+      '<td>' + (CAT_LABELS[c.category] || c.category || '—') + '</td>' +
+      '<td><span class="tag ' + c.status + '">' + (c.status === 'completed' ? 'Concluido' : 'Ativo') + '</span></td>' +
+      '<td style="font-size:12px;color:var(--t2)">' + ((c.assigned_names || []).join(', ') || '—') + '</td>' +
+      '<td style="font-family:JetBrains Mono;font-size:12px">' + timeStr + '</td></tr>';
+  }).join('');
+}
+
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+// ============ SETTINGS ============
+async function loadSettings() {
+  // Connection
+  var conn = await apiCall('/admin/trello-connection');
+  var connEl = document.getElementById('connStatus');
+  var connForm = document.getElementById('connForm');
+  if (conn && conn.trello_api_key) {
+    connEl.innerHTML = '<p style="color:var(--t2);font-size:13px">Conectado — ' + (conn.board_ids || []).length + ' board(s) — Token: ' + conn.trello_token + '</p>';
+    connForm.classList.add('hide');
+  } else {
+    connEl.innerHTML = '';
+    connForm.classList.remove('hide');
+  }
+
+  // Users
+  var users = await apiCall('/admin/users');
+  var tbody = document.getElementById('usersTable');
+  tbody.innerHTML = (users || []).map(function(u) {
+    return '<tr><td>' + u.name + '</td><td style="font-size:12px;color:var(--t2)">' + u.email + '</td>' +
+      '<td><span class="role-tag ' + u.role + '">' + u.role + '</span></td>' +
+      '<td style="font-size:12px">' + ((u.clients || []).join(', ') || '—') + '</td></tr>';
+  }).join('');
+}
+
+document.getElementById('connForm').onsubmit = async function(e) {
+  e.preventDefault();
+  await apiCall('/admin/trello-connection', { method: 'POST', body: JSON.stringify({
+    trello_api_key: document.getElementById('connKey').value,
+    trello_token: document.getElementById('connToken').value,
+    board_ids: document.getElementById('connBoards').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean),
+  })});
+  showToast('Trello conectado!', 'success');
+  loadSettings();
+};
+
+document.getElementById('addUserForm').onsubmit = async function(e) {
+  e.preventDefault();
+  await apiCall('/admin/users', { method: 'POST', body: JSON.stringify({
+    name: document.getElementById('newName').value,
+    email: document.getElementById('newEmail').value,
+    password: document.getElementById('newPass').value,
+    role: document.getElementById('newRole').value,
+  })});
+  document.getElementById('newName').value = '';
+  document.getElementById('newEmail').value = '';
+  document.getElementById('newPass').value = '';
+  showToast('Usuario criado!', 'success');
+  loadSettings();
+};
+
+async function syncNow() {
+  await apiCall('/admin/sync', { method: 'POST' });
+  showToast('Sincronizacao iniciada!', 'success');
+}
+
+// ============ UTILS ============
+function showToast(msg, type) {
+  var ex = document.querySelector('.toast');
+  if (ex) ex.remove();
+  var t = document.createElement('div');
+  t.className = 'toast ' + (type || '');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 4000);
+}
+
+// ============ INIT ============
+sb.auth.getSession().then(function(res) {
+  if (res.data.session) initApp();
+  else showLogin();
+});
+</script>
 </body>
-
 </html>
