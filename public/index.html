@@ -8,256 +8,201 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#f0f2f5;--white:#fff;--sbg:#1b2537;--shov:#243044;--sact:rgba(94,186,156,.15);--ac:#5eba9c;--acd:#4a9e83;--acl:rgba(94,186,156,.1);--td:#1b2537;--tm:#5f6d7e;--tl:#9aa4b2;--bd:#e3e8ef;--sh:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.06);--shh:0 4px 12px rgba(0,0,0,.08);--rd:#e74c5e;--rdbg:#fef2f3;--or:#f5a623;--orbg:#fff8ec;--bl:#4a90d9;--blbg:#eef4fb;--pu:#7c6cdb;--pubg:#f3f1fc;--gn:#5eba9c;--gnbg:#eefaf5;--r:14px;--rs:10px}
+    :root{--bg:#f0f2f5;--wh:#fff;--sbg:#1b2537;--shov:#243044;--sact:rgba(94,186,156,.15);--ac:#5eba9c;--acd:#4a9e83;--acl:rgba(94,186,156,.1);--td:#1b2537;--tm:#5f6d7e;--tl:#9aa4b2;--bd:#e3e8ef;--sh:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.06);--rd:#e74c5e;--rdbg:#fef2f3;--or:#f5a623;--orbg:#fff8ec;--bl:#4a90d9;--blbg:#eef4fb;--pu:#7c6cdb;--pubg:#f3f1fc;--gn:#5eba9c;--gnbg:#eefaf5;--r:14px;--rs:10px}
     *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--td);min-height:100vh;-webkit-font-smoothing:antialiased}.hide{display:none!important}
     ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
-    .login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1b2537 0%,#2d4356 50%,#5eba9c 100%)}
-    .login-card{background:var(--white);border-radius:20px;padding:48px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+    .login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1b2537,#2d4356,#5eba9c)}
+    .login-card{background:var(--wh);border-radius:20px;padding:48px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,.15)}
     .login-card .logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;justify-content:center}
-    .login-card .logo-box{width:40px;height:40px;background:var(--ac);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:18px}
-    .login-card .logo-t{font-size:22px;font-weight:800;color:var(--td);letter-spacing:-.02em}.login-card .logo-t span{color:var(--ac)}
-    .login-card h2{font-size:20px;font-weight:700;text-align:center;margin-bottom:4px}
-    .login-card p{color:var(--tm);font-size:14px;text-align:center;margin-bottom:28px}
-    .input{width:100%;padding:12px 16px;border-radius:var(--rs);border:1.5px solid var(--bd);background:var(--bg);color:var(--td);font-family:'Plus Jakarta Sans';font-size:14px;margin-bottom:12px;outline:none;transition:all .2s}
-    .input:focus{border-color:var(--ac);background:white;box-shadow:0 0 0 3px var(--acl)}
-    select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6' fill='%239aa4b2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+    .login-card .lb{width:40px;height:40px;background:var(--ac);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:18px}
+    .login-card .lt{font-size:22px;font-weight:800;color:var(--td)}.login-card .lt span{color:var(--ac)}
+    .login-card h2{font-size:20px;font-weight:700;text-align:center;margin-bottom:4px}.login-card>p{color:var(--tm);font-size:14px;text-align:center;margin-bottom:28px}
+    .input{width:100%;padding:12px 16px;border-radius:var(--rs);border:1.5px solid var(--bd);background:var(--bg);color:var(--td);font-family:'Plus Jakarta Sans';font-size:14px;margin-bottom:12px;outline:none;transition:all .2s}.input:focus{border-color:var(--ac);background:white;box-shadow:0 0 0 3px var(--acl)}
     .btn-login{width:100%;padding:13px;border-radius:var(--rs);border:none;background:var(--ac);color:white;font-family:'Plus Jakarta Sans';font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}.btn-login:hover{background:var(--acd)}.btn-login:disabled{opacity:.6}
     .error-msg{color:var(--rd);font-size:13px;margin-bottom:8px;text-align:center}
-    .sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--sbg);padding:0;display:flex;flex-direction:column;z-index:50}
-    .sidebar-top{padding:24px 20px 20px}.sidebar .logo{display:flex;align-items:center;gap:10px}
-    .sidebar .logo-box{width:36px;height:36px;background:var(--ac);border-radius:9px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:16px;flex-shrink:0}
-    .sidebar .logo-t{font-size:17px;font-weight:700;color:white}.sidebar .logo-t span{color:var(--ac)}
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--sbg);display:flex;flex-direction:column;z-index:50}
+    .sidebar-top{padding:24px 20px 20px;display:flex;align-items:center;gap:10px}
+    .sidebar-top .lb{width:36px;height:36px;background:var(--ac);border-radius:9px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:16px;flex-shrink:0}
+    .sidebar-top .lt{font-size:17px;font-weight:700;color:white}.sidebar-top .lt span{color:var(--ac)}
     .sidebar-user{margin:8px 16px;padding:14px;background:var(--shov);border-radius:var(--rs);display:flex;align-items:center;gap:12px}
-    .avatar{width:38px;height:38px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:15px;flex-shrink:0}
-    .sidebar-user .uname{font-size:13px;font-weight:600;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .sidebar-user .urole{font-size:11px;color:var(--tl);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
-    .sidebar-nav{flex:1;padding:0 12px}
-    .nav-label{font-size:10px;color:var(--tl);text-transform:uppercase;letter-spacing:.08em;padding:16px 12px 8px;font-weight:600}
-    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;color:rgba(255,255,255,.6);font-size:14px;font-weight:500;cursor:pointer;border-radius:8px;transition:all .15s;margin-bottom:2px}
-    .nav-item:hover{color:white;background:var(--shov)}.nav-item.active{color:var(--ac);background:var(--sact)}
+    .av{width:38px;height:38px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:15px;flex-shrink:0}
+    .sidebar-user .un{font-size:13px;font-weight:600;color:white}.sidebar-user .ur{font-size:11px;color:var(--tl);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+    .sidebar-nav{flex:1;padding:8px 12px}
+    .nl{font-size:10px;color:var(--tl);text-transform:uppercase;letter-spacing:.08em;padding:12px 12px 8px;font-weight:600}
+    .ni{padding:10px 12px;color:rgba(255,255,255,.6);font-size:14px;font-weight:500;cursor:pointer;border-radius:8px;transition:all .15s;margin-bottom:2px}.ni:hover{color:white;background:var(--shov)}.ni.active{color:var(--ac);background:var(--sact)}
     .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
-    .logout-btn{color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;background:none;border:none;font-family:'Plus Jakarta Sans';padding:6px 0;transition:color .15s}.logout-btn:hover{color:var(--rd)}
+    .lo{color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;background:none;border:none;font-family:'Plus Jakarta Sans';padding:6px 0;transition:color .15s}.lo:hover{color:var(--rd)}
     .main{margin-left:240px;padding:28px 32px;min-height:100vh}
-    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
-    .greeting h1{font-size:24px;font-weight:700;letter-spacing:-.02em}.greeting p{font-size:14px;color:var(--tm);margin-top:2px}
-    .controls{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-    .period-bar{display:flex;gap:4px;background:var(--white);border:1px solid var(--bd);border-radius:var(--rs);padding:3px;box-shadow:var(--sh)}
-    .period-btn{padding:7px 16px;border-radius:8px;border:none;background:transparent;color:var(--tm);font-family:'Plus Jakarta Sans';font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
-    .period-btn.active{background:var(--ac);color:white;box-shadow:0 2px 4px rgba(94,186,156,.3)}
-    .filter-bar{display:flex;gap:8px}
-    .filter-select{padding:7px 32px 7px 12px;border-radius:8px;border:1px solid var(--bd);background:white;color:var(--td);font-family:'Plus Jakarta Sans';font-size:13px;font-weight:500;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6' fill='%239aa4b2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;box-shadow:var(--sh);transition:border-color .15s}
-    .filter-select:focus{border-color:var(--ac)}
-    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
-    .stat-card{background:var(--white);border-radius:var(--r);padding:20px;box-shadow:var(--sh);border:1px solid var(--bd);transition:box-shadow .2s}.stat-card:hover{box-shadow:var(--shh)}
-    .stat-card .stat-bar{width:36px;height:4px;border-radius:2px;margin-bottom:14px}
-    .stat-card .stat-label{font-size:13px;color:var(--tm);font-weight:500;margin-bottom:6px}
-    .stat-card .stat-value{font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--td)}.stat-card .stat-value.red{color:var(--rd)}
-    .stat-card .stat-sub{font-size:12px;color:var(--tl);margin-top:4px}
-    .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
-    .chart-card{background:var(--white);border-radius:var(--r);padding:20px;box-shadow:var(--sh);border:1px solid var(--bd)}.chart-card.full{grid-column:1/-1}
-    .chart-title{font-size:15px;font-weight:700;color:var(--td);margin-bottom:16px}
-    .table-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--bd);overflow:hidden;margin-bottom:24px}
-    .table-top{padding:18px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd)}.table-top h3{font-size:15px;font-weight:700}
+    .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+    .ph h1{font-size:24px;font-weight:700;letter-spacing:-.02em}.ph>div>p{font-size:14px;color:var(--tm);margin-top:2px}
+    .ctrls{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+    .pb{display:flex;gap:4px;background:var(--wh);border:1px solid var(--bd);border-radius:var(--rs);padding:3px;box-shadow:var(--sh)}
+    .pbtn{padding:7px 16px;border-radius:8px;border:none;background:transparent;color:var(--tm);font-family:'Plus Jakarta Sans';font-size:13px;font-weight:600;cursor:pointer}.pbtn.active{background:var(--ac);color:white}
+    .fb{display:flex;gap:8px}
+    .fs{padding:7px 32px 7px 12px;border-radius:8px;border:1px solid var(--bd);background:white;color:var(--td);font-family:'Plus Jakarta Sans';font-size:13px;font-weight:500;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6' fill='%239aa4b2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;box-shadow:var(--sh)}.fs:focus{border-color:var(--ac)}
+    .sg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+    .sc{background:var(--wh);border-radius:var(--r);padding:20px;box-shadow:var(--sh);border:1px solid var(--bd)}
+    .sc .sb{width:36px;height:4px;border-radius:2px;margin-bottom:14px}.sc .sl{font-size:13px;color:var(--tm);font-weight:500;margin-bottom:6px}
+    .sc .sv{font-size:28px;font-weight:800;letter-spacing:-.03em}.sc .sv.red{color:var(--rd)}.sc .ss{font-size:12px;color:var(--tl);margin-top:4px}
+    .cg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+    .cc{background:var(--wh);border-radius:var(--r);padding:20px;box-shadow:var(--sh);border:1px solid var(--bd)}.cc.full{grid-column:1/-1}
+    .ct{font-size:15px;font-weight:700;margin-bottom:16px}
+    .tc{background:var(--wh);border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--bd);overflow:hidden;margin-bottom:24px}
+    .tt{padding:18px 20px;border-bottom:1px solid var(--bd)}.tt h3{font-size:15px;font-weight:700}
     table{width:100%;border-collapse:collapse}th{text-align:left;padding:10px 16px;font-size:11px;color:var(--tl);text-transform:uppercase;letter-spacing:.06em;font-weight:600;background:#fafbfc;border-bottom:1px solid var(--bd)}
-    td{padding:12px 16px;font-size:13px;border-bottom:1px solid #f3f4f6;color:var(--td)}tr:last-child td{border-bottom:none}tr:hover td{background:#f9fafb}
-    .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+    td{padding:12px 16px;font-size:13px;border-bottom:1px solid #f3f4f6}tr:last-child td{border-bottom:none}tr:hover td{background:#f9fafb}
+    .tag{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
     .tag.active{background:var(--blbg);color:var(--bl)}.tag.completed{background:var(--gnbg);color:var(--gn)}.tag.overdue{background:var(--rdbg);color:var(--rd)}
-    .tag-cat{display:inline-flex;align-items:center;gap:5px;font-size:12px}.tag-dot{width:8px;height:8px;border-radius:50%}
-    .settings-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--bd);padding:24px;margin-bottom:20px}
-    .settings-card h3{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.form-group{display:flex;flex-direction:column;gap:5px}.form-group label{font-size:13px;color:var(--tm);font-weight:500}
-    .btn{padding:9px 18px;border-radius:var(--rs);border:1px solid var(--bd);background:white;color:var(--td);font-family:'Plus Jakarta Sans';font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}.btn:hover{background:var(--bg)}
-    .btn-accent{background:var(--ac);color:white;border-color:var(--ac)}.btn-accent:hover{background:var(--acd)}.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
-    .role-tag{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
-    .role-tag.gestao{background:var(--rdbg);color:var(--rd)}.role-tag.cs{background:var(--orbg);color:var(--or)}.role-tag.operacao{background:var(--blbg);color:var(--bl)}
-    .conn-ok{padding:12px 16px;background:var(--gnbg);border-radius:var(--rs);font-weight:600;font-size:13px;color:var(--gn)}
-    .toast{position:fixed;bottom:24px;right:24px;padding:14px 22px;border-radius:var(--rs);font-size:14px;font-weight:500;background:white;box-shadow:0 8px 30px rgba(0,0,0,.12);z-index:1000;animation:slideUp .3s;border-left:4px solid}
-    .toast.success{border-color:var(--gn);color:var(--gn)}.toast.error{border-color:var(--rd);color:var(--rd)}
-    @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-    @media(max-width:1024px){.sidebar{display:none}.main{margin-left:0}.stats-grid{grid-template-columns:repeat(2,1fr)}.charts-grid,.form-grid{grid-template-columns:1fr}.filter-bar{flex-wrap:wrap}}
+    .tag.p-altissima{background:var(--rdbg);color:var(--rd)}.tag.p-alta{background:var(--orbg);color:var(--or)}.tag.p-media{background:#fef9e7;color:#b8860b}.tag.p-baixa{background:var(--gnbg);color:var(--gn)}.tag.p-neutra{background:#f0f2f5;color:var(--tm)}
+    .td2{display:inline-flex;align-items:center;gap:5px;font-size:12px}.td2 .dot{width:8px;height:8px;border-radius:50%}
+    .stc{background:var(--wh);border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--bd);padding:24px;margin-bottom:20px}
+    .stc h3{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+    .fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}.fgr{display:flex;flex-direction:column;gap:5px}.fgr label{font-size:13px;color:var(--tm);font-weight:500}
+    .btn{padding:9px 18px;border-radius:var(--rs);border:1px solid var(--bd);background:white;color:var(--td);font-family:'Plus Jakarta Sans';font-size:13px;font-weight:600;cursor:pointer}.btn:hover{background:var(--bg)}
+    .ba{background:var(--ac);color:white;border-color:var(--ac)}.ba:hover{background:var(--acd)}.bs{padding:6px 12px;font-size:12px;border-radius:8px}
+    .rt{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase}.rt.gestao{background:var(--rdbg);color:var(--rd)}.rt.cs{background:var(--orbg);color:var(--or)}.rt.operacao{background:var(--blbg);color:var(--bl)}
+    .toast{position:fixed;bottom:24px;right:24px;padding:14px 22px;border-radius:var(--rs);font-size:14px;font-weight:500;background:white;box-shadow:0 8px 30px rgba(0,0,0,.12);z-index:1000;animation:su .3s;border-left:4px solid}.toast.success{border-color:var(--gn);color:var(--gn)}.toast.error{border-color:var(--rd);color:var(--rd)}
+    @keyframes su{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+    @media(max-width:1024px){.sidebar{display:none}.main{margin-left:0}.sg{grid-template-columns:repeat(2,1fr)}.cg,.fg{grid-template-columns:1fr}.fb{flex-wrap:wrap}}
   </style>
 </head>
 <body>
-<div id="loginPage" class="login-page">
-  <div class="login-card">
-    <div class="logo"><div class="logo-box">W</div><div class="logo-t">WBP <span>Productivity</span></div></div>
-    <h2>Bem-vindo de volta</h2>
-    <p>Entre com suas credenciais para continuar</p>
-    <form id="loginForm">
-      <input class="input" type="email" id="loginEmail" placeholder="Seu email" required />
-      <input class="input" type="password" id="loginPass" placeholder="Sua senha" required />
-      <div id="loginError" class="error-msg hide"></div>
-      <button class="btn-login" type="submit" id="loginBtn">Entrar</button>
-    </form>
-  </div>
-</div>
-<div id="appPage" class="hide">
+<div id="lp" class="login-page"><div class="login-card">
+  <div class="logo"><div class="lb">W</div><div class="lt">WBP <span>Productivity</span></div></div>
+  <h2>Bem-vindo de volta</h2><p>Entre com suas credenciais</p>
+  <form id="lf"><input class="input" type="email" id="le" placeholder="Email" required /><input class="input" type="password" id="lp2" placeholder="Senha" required />
+  <div id="lerr" class="error-msg hide"></div><button class="btn-login" type="submit" id="lb2">Entrar</button></form>
+</div></div>
+
+<div id="ap" class="hide">
   <div class="sidebar">
-    <div class="sidebar-top"><div class="logo"><div class="logo-box">W</div><div class="logo-t">WBP <span>Prod</span></div></div></div>
-    <div class="sidebar-user">
-      <div class="avatar" id="userAvatar">F</div>
-      <div><div class="uname" id="sidebarName">--</div><div class="urole" id="sidebarRole">--</div></div>
-    </div>
-    <div class="sidebar-nav">
-      <div class="nav-label">Menu</div>
-      <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">Dashboard</div>
-      <div class="nav-item" onclick="showPage('settings')" id="nav-settings" style="display:none">Configuracoes</div>
-    </div>
-    <div class="sidebar-footer"><button class="logout-btn" onclick="logout()">Sair da conta</button></div>
+    <div class="sidebar-top"><div class="lb">W</div><div class="lt">WBP <span>Prod</span></div></div>
+    <div class="sidebar-user"><div class="av" id="ua">F</div><div><div class="un" id="sn">--</div><div class="ur" id="sr">--</div></div></div>
+    <div class="sidebar-nav"><div class="nl">Menu</div><div class="ni active" onclick="sp('dashboard')" id="nd">Dashboard</div><div class="ni" onclick="sp('settings')" id="ns" style="display:none">Configuracoes</div></div>
+    <div class="sidebar-footer"><button class="lo" onclick="lo()">Sair da conta</button></div>
   </div>
   <div class="main">
-    <div id="page-dashboard">
-      <div class="page-header">
-        <div class="greeting"><h1 id="greetingText">Bom dia</h1><p id="greetingDate">--</p></div>
-        <div class="controls">
-          <div class="period-bar">
-            <button class="period-btn" onclick="setPeriod(7)">7 dias</button>
-            <button class="period-btn" onclick="setPeriod(14)">14 dias</button>
-            <button class="period-btn active" onclick="setPeriod(30)">30 dias</button>
-            <button class="period-btn" onclick="setPeriod(90)">90 dias</button>
-          </div>
-          <div class="filter-bar">
-            <select class="filter-select" id="filterClient" onchange="loadDashboard()"><option value="all">Todos os clientes</option></select>
-            <select class="filter-select" id="filterPerson" onchange="loadDashboard()"><option value="all">Todos os analistas</option></select>
-          </div>
+    <div id="pd">
+      <div class="ph"><div><h1 id="gt">Bom dia</h1><p id="gd">--</p></div>
+        <div class="ctrls"><div class="pb">
+          <button class="pbtn" onclick="spr(7)">7 dias</button><button class="pbtn" onclick="spr(14)">14 dias</button>
+          <button class="pbtn active" onclick="spr(30)">30 dias</button><button class="pbtn" onclick="spr(90)">90 dias</button></div>
+          <div class="fb"><select class="fs" id="fc" onchange="ld()"><option value="all">Todos os clientes</option></select>
+          <select class="fs" id="fp" onchange="ld()"><option value="all">Todos os responsaveis</option></select></div>
         </div>
       </div>
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-bar" style="background:var(--bl)"></div><div class="stat-label">Total de tarefas</div><div class="stat-value" id="statTotal">--</div></div>
-        <div class="stat-card"><div class="stat-bar" style="background:var(--or)"></div><div class="stat-label">Pendentes</div><div class="stat-value" id="statActive">--</div></div>
-        <div class="stat-card"><div class="stat-bar" style="background:var(--gn)"></div><div class="stat-label">Concluidas</div><div class="stat-value" id="statCompleted">--</div></div>
-        <div class="stat-card"><div class="stat-bar" style="background:var(--pu)"></div><div class="stat-label">Taxa de conclusao</div><div class="stat-value" id="statRate">--</div></div>
-        <div class="stat-card"><div class="stat-bar" style="background:var(--rd)"></div><div class="stat-label">Atrasadas</div><div class="stat-value red" id="statOverdue">--</div></div>
-        <div class="stat-card"><div class="stat-bar" style="background:var(--bl)"></div><div class="stat-label">Tempo medio</div><div class="stat-value" id="statAvg">--</div><div class="stat-sub">para conclusao</div></div>
+      <div class="sg">
+        <div class="sc"><div class="sb" style="background:var(--bl)"></div><div class="sl">Total de tarefas</div><div class="sv" id="s1">--</div></div>
+        <div class="sc"><div class="sb" style="background:var(--or)"></div><div class="sl">Pendentes</div><div class="sv" id="s2">--</div></div>
+        <div class="sc"><div class="sb" style="background:var(--gn)"></div><div class="sl">Concluidas</div><div class="sv" id="s3">--</div></div>
+        <div class="sc"><div class="sb" style="background:var(--pu)"></div><div class="sl">Taxa de conclusao</div><div class="sv" id="s4">--</div></div>
+        <div class="sc"><div class="sb" style="background:var(--rd)"></div><div class="sl">Atrasadas</div><div class="sv red" id="s5">--</div></div>
+        <div class="sc"><div class="sb" style="background:var(--bl)"></div><div class="sl">Tempo medio</div><div class="sv" id="s6">--</div><div class="ss">para conclusao</div></div>
       </div>
-      <div class="charts-grid">
-        <div class="chart-card"><div class="chart-title">Desempenho por cliente</div><canvas id="chartClient"></canvas></div>
-        <div class="chart-card"><div class="chart-title">Distribuicao por categoria</div><canvas id="chartCategory"></canvas></div>
-        <div class="chart-card full"><div class="chart-title">Evolucao semanal</div><canvas id="chartTimeline" height="80"></canvas></div>
-        <div class="chart-card full" id="personChartWrap"><div class="chart-title">Performance por pessoa</div><canvas id="chartPerson" height="80"></canvas></div>
+      <div class="cg">
+        <div class="cc"><div class="ct">Por cliente</div><canvas id="c1"></canvas></div>
+        <div class="cc"><div class="ct">Por categoria</div><canvas id="c2"></canvas></div>
+        <div class="cc"><div class="ct">Por prioridade</div><canvas id="c3"></canvas></div>
+        <div class="cc" id="pw"><div class="ct">Por responsavel</div><canvas id="c4"></canvas></div>
+        <div class="cc full"><div class="ct">Evolucao semanal</div><canvas id="c5" height="80"></canvas></div>
       </div>
-      <div class="table-card">
-        <div class="table-top"><h3>Atividades recentes</h3></div>
-        <table><thead><tr><th>Card</th><th>Cliente</th><th>Categoria</th><th>Status</th><th>Responsavel</th><th>Tempo</th></tr></thead>
-        <tbody id="recentTable"></tbody></table>
+      <div class="tc"><div class="tt"><h3>Atividades recentes</h3></div>
+        <table><thead><tr><th>Card</th><th>Cliente</th><th>Responsavel</th><th>Prioridade</th><th>Status</th><th>Tempo</th></tr></thead><tbody id="rt"></tbody></table>
       </div>
     </div>
-    <div id="page-settings" class="hide">
-      <div class="page-header"><div class="greeting"><h1>Configuracoes</h1><p>Gerencie conexoes e equipe</p></div></div>
-      <div class="settings-card">
-        <h3>Conexao Trello <button class="btn btn-sm" onclick="syncNow()">Sincronizar</button></h3>
-        <div id="connStatus"></div>
-        <form id="connForm" class="hide">
-          <div class="form-grid">
-            <div class="form-group"><label>Trello API Key</label><input class="input" id="connKey" /></div>
-            <div class="form-group"><label>Trello Token</label><input class="input" id="connToken" /></div>
-          </div>
-          <div class="form-group" style="margin-top:14px"><label>Board IDs (virgula)</label><input class="input" id="connBoards" /></div>
-          <button class="btn btn-accent" type="submit" style="margin-top:14px">Conectar Trello</button>
-        </form>
-      </div>
-      <div class="settings-card">
-        <h3>Novo usuario</h3>
-        <form id="addUserForm">
-          <div class="form-grid">
-            <div class="form-group"><label>Nome</label><input class="input" id="newName" required /></div>
-            <div class="form-group"><label>Email</label><input class="input" type="email" id="newEmail" required /></div>
-            <div class="form-group"><label>Senha inicial</label><input class="input" id="newPass" required /></div>
-            <div class="form-group"><label>Permissao</label><select class="input" id="newRole"><option value="operacao">Operacao</option><option value="cs">CS</option><option value="gestao">Gestao</option></select></div>
-          </div>
-          <button class="btn btn-accent" type="submit" style="margin-top:14px">Criar usuario</button>
-        </form>
-      </div>
-      <div class="table-card">
-        <div class="table-top"><h3>Equipe</h3></div>
-        <table><thead><tr><th>Nome</th><th>Email</th><th>Permissao</th><th>Clientes</th></tr></thead><tbody id="usersTable"></tbody></table>
-      </div>
+    <div id="ps" class="hide">
+      <div class="ph"><div><h1>Configuracoes</h1><p>Gerencie conexoes e equipe</p></div></div>
+      <div class="stc"><h3>Conexao Trello <button class="btn bs" onclick="sy()">Sincronizar</button></h3><div id="cs2"></div>
+        <form id="cf" class="hide"><div class="fg"><div class="fgr"><label>API Key</label><input class="input" id="ck" /></div><div class="fgr"><label>Token</label><input class="input" id="cto" /></div></div>
+        <div class="fgr" style="margin-top:14px"><label>Board IDs (virgula)</label><input class="input" id="cb" /></div><button class="btn ba" type="submit" style="margin-top:14px">Conectar</button></form></div>
+      <div class="stc"><h3>Novo usuario</h3><form id="uf"><div class="fg"><div class="fgr"><label>Nome</label><input class="input" id="nn" required /></div><div class="fgr"><label>Email</label><input class="input" type="email" id="ne" required /></div>
+        <div class="fgr"><label>Senha</label><input class="input" id="np" required /></div><div class="fgr"><label>Permissao</label><select class="input" id="nr"><option value="operacao">Operacao</option><option value="cs">CS</option><option value="gestao">Gestao</option></select></div></div>
+        <button class="btn ba" type="submit" style="margin-top:14px">Criar usuario</button></form></div>
+      <div class="tc"><div class="tt"><h3>Equipe</h3></div><table><thead><tr><th>Nome</th><th>Email</th><th>Permissao</th><th>Clientes</th></tr></thead><tbody id="ut"></tbody></table></div>
     </div>
   </div>
 </div>
 <script>
-var SUPABASE_URL='https://ciggioucwilhqpuxtzue.supabase.co';
-var SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZ2dpb3Vjd2lsaHFwdXh0enVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MDY2MDAsImV4cCI6MjA5MzA4MjYwMH0.1JzEq9IrOPNgwr4NYiQYrVPPOTmneobPJYCvkEN8BSw';
-var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
-var API=window.location.origin,currentUser=null,currentPeriod=30,charts={};
-var CAT_LABELS={midia_paga:'Midia Paga',social_media:'Social Media',crm:'CRM',ai_automacao:'AI/Automacao',tracking_dados:'Tracking',estrategia:'Estrategia',criacao:'Criacao',operacional:'Operacional',sem_categoria:'Outros'};
-var COLORS=['#5eba9c','#4a90d9','#7c6cdb','#f5a623','#e74c5e','#ec4899','#14b8a6','#8b5cf6','#f97316','#06b6d4'];
+var SU='https://ciggioucwilhqpuxtzue.supabase.co',SA='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZ2dpb3Vjd2lsaHFwdXh0enVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MDY2MDAsImV4cCI6MjA5MzA4MjYwMH0.1JzEq9IrOPNgwr4NYiQYrVPPOTmneobPJYCvkEN8BSw';
+var sb=window.supabase.createClient(SU,SA),API=window.location.origin,cu=null,cp=30,ch={};
+var CL={midia_paga:'Midia Paga',social_media:'Social Media',crm:'CRM',ai_automacao:'AI/Auto',tracking_dados:'Tracking',estrategia:'Estrategia',criacao:'Criacao',operacional:'Operacional',sem_categoria:'Outros'};
+var CO=['#5eba9c','#4a90d9','#7c6cdb','#f5a623','#e74c5e','#ec4899','#14b8a6','#8b5cf6'];
+var PC={altissima:'#e74c5e',alta:'#f5a623',media:'#dab600',baixa:'#5eba9c',neutra:'#9aa4b2'};
 Chart.defaults.color='#9aa4b2';Chart.defaults.borderColor='#e3e8ef';Chart.defaults.font.family='Plus Jakarta Sans';Chart.defaults.font.weight=500;
 
-async function apiCall(path,opts){var s=(await sb.auth.getSession()).data.session;if(!s)throw new Error('x');
-  var r=await fetch(API+'/api'+path,{...opts,headers:{'Authorization':'Bearer '+s.access_token,'Content-Type':'application/json',...(opts?.headers||{})}});return r.json();}
+async function ac(p,o){var s=(await sb.auth.getSession()).data.session;if(!s)throw'x';
+  return(await fetch(API+'/api'+p,{...o,headers:{'Authorization':'Bearer '+s.access_token,'Content-Type':'application/json',...(o?.headers||{})}})).json();}
+function gf(){var c=document.getElementById('fc').value,p=document.getElementById('fp').value,r='';if(c&&c!=='all')r+='&client='+encodeURIComponent(c);if(p&&p!=='all')r+='&person='+encodeURIComponent(p);return r;}
 
-function getFilterParams(){var c=document.getElementById('filterClient').value;var p=document.getElementById('filterPerson').value;
-  var params='';if(c&&c!=='all')params+='&client='+encodeURIComponent(c);if(p&&p!=='all')params+='&person='+encodeURIComponent(p);return params;}
+document.getElementById('lf').onsubmit=async function(e){e.preventDefault();var b=document.getElementById('lb2'),er=document.getElementById('lerr');b.disabled=true;er.classList.add('hide');
+  var{error}=await sb.auth.signInWithPassword({email:document.getElementById('le').value,password:document.getElementById('lp2').value});
+  if(error){er.textContent=error.message;er.classList.remove('hide');b.disabled=false;}else ia();};
 
-document.getElementById('loginForm').onsubmit=async function(e){e.preventDefault();var btn=document.getElementById('loginBtn'),err=document.getElementById('loginError');btn.disabled=true;err.classList.add('hide');
-  var{error}=await sb.auth.signInWithPassword({email:document.getElementById('loginEmail').value,password:document.getElementById('loginPass').value});
-  if(error){err.textContent=error.message;err.classList.remove('hide');btn.disabled=false;}else initApp();};
+async function ia(){var s=(await sb.auth.getSession()).data.session;if(!s){sl();return;}try{cu=await ac('/admin/me');}catch(e){sl();return;}
+  document.getElementById('lp').classList.add('hide');document.getElementById('ap').classList.remove('hide');
+  document.getElementById('sn').textContent=cu.name;document.getElementById('sr').textContent=cu.role;document.getElementById('ua').textContent=(cu.name||'U')[0].toUpperCase();
+  var h=new Date().getHours();document.getElementById('gt').textContent=(h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+', '+(cu.name||'').split(' ')[0];
+  document.getElementById('gd').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  if(cu.role==='gestao')document.getElementById('ns').style.display='';
+  if(cu.role==='operacao')document.getElementById('pw').style.display='none';
+  lf2();ld();}
 
-async function initApp(){var s=(await sb.auth.getSession()).data.session;if(!s){showLogin();return;}
-  try{currentUser=await apiCall('/admin/me');}catch(e){showLogin();return;}
-  document.getElementById('loginPage').classList.add('hide');document.getElementById('appPage').classList.remove('hide');
-  document.getElementById('sidebarName').textContent=currentUser.name;document.getElementById('sidebarRole').textContent=currentUser.role;
-  document.getElementById('userAvatar').textContent=(currentUser.name||'U')[0].toUpperCase();
-  var h=new Date().getHours();document.getElementById('greetingText').textContent=(h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+', '+(currentUser.name||'').split(' ')[0];
-  document.getElementById('greetingDate').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  if(currentUser.role==='gestao')document.getElementById('nav-settings').style.display='';
-  if(currentUser.role==='operacao')document.getElementById('personChartWrap').style.display='none';
-  loadFilters();loadDashboard();}
+function sl(){document.getElementById('lp').classList.remove('hide');document.getElementById('ap').classList.add('hide');document.getElementById('lb2').disabled=false;}
+async function lo(){await sb.auth.signOut();cu=null;sl();}
+function sp(p){document.querySelectorAll('.ni').forEach(function(e){e.classList.remove('active')});document.getElementById(p==='dashboard'?'nd':'ns').classList.add('active');
+  document.getElementById('pd').classList.add('hide');document.getElementById('ps').classList.add('hide');document.getElementById(p==='dashboard'?'pd':'ps').classList.remove('hide');if(p==='settings')ls();}
+function spr(d){cp=d;document.querySelectorAll('.pbtn').forEach(function(b){b.classList.remove('active')});event.target.classList.add('active');ld();}
 
-function showLogin(){document.getElementById('loginPage').classList.remove('hide');document.getElementById('appPage').classList.add('hide');document.getElementById('loginBtn').disabled=false;}
-async function logout(){await sb.auth.signOut();currentUser=null;showLogin();}
-function showPage(p){document.querySelectorAll('.nav-item').forEach(function(e){e.classList.remove('active')});document.getElementById('nav-'+p).classList.add('active');
-  document.getElementById('page-dashboard').classList.add('hide');document.getElementById('page-settings').classList.add('hide');document.getElementById('page-'+p).classList.remove('hide');if(p==='settings')loadSettings();}
-function setPeriod(d){currentPeriod=d;document.querySelectorAll('.period-btn').forEach(function(b){b.classList.remove('active')});event.target.classList.add('active');loadDashboard();}
-
-async function loadFilters(){try{var f=await apiCall('/metrics/filters');var cs=document.getElementById('filterClient');var ps=document.getElementById('filterPerson');
+async function lf2(){try{var f=await ac('/metrics/filters');var cs=document.getElementById('fc'),ps=document.getElementById('fp');
   cs.innerHTML='<option value="all">Todos os clientes</option>';(f.clients||[]).forEach(function(c){cs.innerHTML+='<option value="'+c+'">'+c+'</option>';});
-  ps.innerHTML='<option value="all">Todos os analistas</option>';(f.people||[]).forEach(function(p){ps.innerHTML+='<option value="'+p+'">'+p+'</option>';});
-  }catch(e){}}
+  ps.innerHTML='<option value="all">Todos os responsaveis</option>';(f.people||[]).forEach(function(p){ps.innerHTML+='<option value="'+p+'">'+p+'</option>';});}catch(e){}}
 
-async function loadDashboard(){var fp=getFilterParams();var d=currentPeriod;
-  var[ov,cl,cat,per,tl,rc]=await Promise.all([apiCall('/metrics/overview?days='+d+fp),apiCall('/metrics/by-client?days='+d+fp),apiCall('/metrics/by-category?days='+d+fp),
-    apiCall('/metrics/by-person?days='+d+fp),apiCall('/metrics/timeline?days='+d+fp),apiCall('/metrics/recent-cards?limit=12'+fp)]);
+async function ld(){var f=gf(),d=cp;
+  var[ov,cl,cat,pri,per,tl,rc]=await Promise.all([ac('/metrics/overview?days='+d+f),ac('/metrics/by-client?days='+d+f),ac('/metrics/by-category?days='+d+f),
+    ac('/metrics/by-priority?days='+d+f),ac('/metrics/by-person?days='+d+f),ac('/metrics/timeline?days='+d+f),ac('/metrics/recent-cards?limit=12'+f)]);
 
-  document.getElementById('statTotal').textContent=ov.totalCards||0;document.getElementById('statActive').textContent=ov.activeCards||0;
-  document.getElementById('statCompleted').textContent=ov.completedCards||0;document.getElementById('statRate').textContent=(ov.completionRate||0)+'%';
-  document.getElementById('statOverdue').textContent=ov.overdueCards||0;
-  document.getElementById('statAvg').textContent=ov.avgCompletionHours>24?(ov.avgCompletionHours/24).toFixed(1)+'d':(ov.avgCompletionHours||0)+'h';
+  document.getElementById('s1').textContent=ov.totalCards||0;document.getElementById('s2').textContent=ov.activeCards||0;
+  document.getElementById('s3').textContent=ov.completedCards||0;document.getElementById('s4').textContent=(ov.completionRate||0)+'%';
+  document.getElementById('s5').textContent=ov.overdueCards||0;
+  document.getElementById('s6').textContent=ov.avgCompletionHours>24?(ov.avgCompletionHours/24).toFixed(1)+'d':(ov.avgCompletionHours||0)+'h';
 
-  dc('chartClient');charts.chartClient=new Chart(document.getElementById('chartClient'),{type:'bar',data:{labels:(cl||[]).map(function(c){return c.client}),datasets:[{label:'Concluidos',data:(cl||[]).map(function(c){return c.completed}),backgroundColor:'#5eba9c',borderRadius:6},{label:'Ativos',data:(cl||[]).map(function(c){return c.active}),backgroundColor:'#4a90d9',borderRadius:6}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true,pointStyle:'circle'}}},scales:{x:{grid:{color:'#f0f2f5'}},y:{grid:{display:false}}}}});
+  dc('c1');ch.c1=new Chart(document.getElementById('c1'),{type:'bar',data:{labels:(cl||[]).map(function(c){return c.client}),datasets:[{label:'Concluidos',data:(cl||[]).map(function(c){return c.completed}),backgroundColor:'#5eba9c',borderRadius:6},{label:'Ativos',data:(cl||[]).map(function(c){return c.active}),backgroundColor:'#4a90d9',borderRadius:6}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true,pointStyle:'circle'}}},scales:{x:{grid:{color:'#f0f2f5'}},y:{grid:{display:false}}}}});
 
-  dc('chartCategory');charts.chartCategory=new Chart(document.getElementById('chartCategory'),{type:'doughnut',data:{labels:(cat||[]).map(function(c){return CAT_LABELS[c.category]||c.category}),datasets:[{data:(cat||[]).map(function(c){return c.total}),backgroundColor:COLORS.slice(0,(cat||[]).length),borderWidth:0,hoverOffset:6}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{padding:12,usePointStyle:true,pointStyle:'circle',font:{size:11}}}}}});
+  dc('c2');ch.c2=new Chart(document.getElementById('c2'),{type:'doughnut',data:{labels:(cat||[]).map(function(c){return CL[c.category]||c.category}),datasets:[{data:(cat||[]).map(function(c){return c.total}),backgroundColor:CO.slice(0,(cat||[]).length),borderWidth:0,hoverOffset:6}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{padding:12,usePointStyle:true,pointStyle:'circle',font:{size:11}}}}}});
 
-  dc('chartTimeline');charts.chartTimeline=new Chart(document.getElementById('chartTimeline'),{type:'line',data:{labels:(tl||[]).map(function(t){var x=new Date(t.week);return x.getDate()+'/'+(x.getMonth()+1)}),datasets:[{label:'Criados',data:(tl||[]).map(function(t){return t.created}),borderColor:'#4a90d9',backgroundColor:'rgba(74,144,217,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#4a90d9',borderWidth:2},{label:'Concluidos',data:(tl||[]).map(function(t){return t.completed}),borderColor:'#5eba9c',backgroundColor:'rgba(94,186,156,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#5eba9c',borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true,pointStyle:'circle'}}},scales:{x:{grid:{color:'#f0f2f5'}},y:{grid:{color:'#f0f2f5'},beginAtZero:true}}}});
+  // Prioridade
+  var pris=pri.priorities||[];
+  dc('c3');ch.c3=new Chart(document.getElementById('c3'),{type:'bar',data:{labels:pris.map(function(p){return p.label+' ('+p.pct+'%)'}),datasets:[{label:'Concluidos',data:pris.map(function(p){return p.completed}),backgroundColor:pris.map(function(p){return PC[p.priority]||'#999'}),borderRadius:6},{label:'Ativos',data:pris.map(function(p){return p.active}),backgroundColor:'rgba(154,164,178,.3)',borderRadius:6}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true,pointStyle:'circle'}}},scales:{x:{stacked:true,grid:{color:'#f0f2f5'}},y:{stacked:true,grid:{display:false}}}}});
 
-  if(currentUser.role!=='operacao'){dc('chartPerson');charts.chartPerson=new Chart(document.getElementById('chartPerson'),{type:'bar',data:{labels:(per||[]).map(function(p){return p.name}),datasets:[{label:'Concluidos',data:(per||[]).map(function(p){return p.completed}),backgroundColor:'#5eba9c',borderRadius:6},{label:'Ativos',data:(per||[]).map(function(p){return p.active}),backgroundColor:'#4a90d9',borderRadius:6}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true,pointStyle:'circle'}}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f2f5'},beginAtZero:true}}}});}
+  if(cu.role!=='operacao'){dc('c4');ch.c4=new Chart(document.getElementById('c4'),{type:'bar',data:{labels:(per||[]).map(function(p){return p.name}),datasets:[{label:'Concluidos',data:(per||[]).map(function(p){return p.completed}),backgroundColor:'#5eba9c',borderRadius:6},{label:'Ativos',data:(per||[]).map(function(p){return p.active}),backgroundColor:'#4a90d9',borderRadius:6}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true,pointStyle:'circle'}}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f0f2f5'},beginAtZero:true}}}});}
 
-  var tb=document.getElementById('recentTable');
+  dc('c5');ch.c5=new Chart(document.getElementById('c5'),{type:'line',data:{labels:(tl||[]).map(function(t){var x=new Date(t.week);return x.getDate()+'/'+(x.getMonth()+1)}),datasets:[{label:'Criados',data:(tl||[]).map(function(t){return t.created}),borderColor:'#4a90d9',backgroundColor:'rgba(74,144,217,.08)',fill:true,tension:.4,pointRadius:4,borderWidth:2},{label:'Concluidos',data:(tl||[]).map(function(t){return t.completed}),borderColor:'#5eba9c',backgroundColor:'rgba(94,186,156,.08)',fill:true,tension:.4,pointRadius:4,borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true,pointStyle:'circle'}}},scales:{x:{grid:{color:'#f0f2f5'}},y:{grid:{color:'#f0f2f5'},beginAtZero:true}}}});
+
+  // Tabela
+  var tb=document.getElementById('rt');
   tb.innerHTML=(rc||[]).map(function(c){var ts=c.time_to_complete_hours?(c.time_to_complete_hours>24?(c.time_to_complete_hours/24).toFixed(1)+'d':c.time_to_complete_hours.toFixed(0)+'h'):'--';
-    var ci=Object.keys(CAT_LABELS).indexOf(c.category);var dc2=ci>=0?COLORS[ci%COLORS.length]:'#ccc';
-    var isOverdue=c.status==='active'&&c.due_date&&new Date(c.due_date)<new Date();
-    var statusTag=isOverdue?'overdue':c.status;var statusLabel=isOverdue?'Atrasado':c.status==='completed'?'Concluido':'Ativo';
-    return'<tr><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500'+(isOverdue?';color:var(--rd)':'')+'" >'+c.title+'</td>'+
-      '<td style="color:var(--tm)">'+( c.client||'--')+'</td>'+
-      '<td><span class="tag-cat"><span class="tag-dot" style="background:'+dc2+'"></span>'+(CAT_LABELS[c.category]||c.category||'--')+'</span></td>'+
-      '<td><span class="tag '+statusTag+'">'+statusLabel+'</span></td>'+
-      '<td style="font-size:12px;color:var(--tm)">'+((c.assigned_names||[]).join(', ')||'--')+'</td>'+
+    var od=c.status==='active'&&c.due_date&&new Date(c.due_date)<new Date();var st=od?'overdue':c.status;var stl=od?'Atrasado':c.status==='completed'?'Concluido':'Ativo';
+    var pr=c.priority||'neutra';var prl={altissima:'Altissima',alta:'Alta',media:'Media',baixa:'Baixa',neutra:'Neutra'};
+    return'<tr><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500'+(od?';color:var(--rd)':'')+'" >'+c.title+'</td>'+
+      '<td style="color:var(--tm)">'+(c.client||'--')+'</td>'+
+      '<td style="color:var(--tm)">'+(c.responsible||'--')+'</td>'+
+      '<td><span class="tag p-'+pr+'">'+(prl[pr]||pr)+'</span></td>'+
+      '<td><span class="tag '+st+'">'+stl+'</span></td>'+
       '<td style="font-family:JetBrains Mono;font-size:12px;color:var(--tm)">'+ts+'</td></tr>';}).join('');}
 
-function dc(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+function dc(id){if(ch[id]){ch[id].destroy();delete ch[id];}}
 
-async function loadSettings(){var conn=await apiCall('/admin/trello-connection');var ce=document.getElementById('connStatus'),cf=document.getElementById('connForm');
-  if(conn&&conn.trello_api_key){ce.innerHTML='<div class="conn-ok">Trello conectado — '+(conn.board_ids||[]).length+' board(s) sincronizados</div>';cf.classList.add('hide');}
-  else{ce.innerHTML='';cf.classList.remove('hide');}
-  var users=await apiCall('/admin/users');document.getElementById('usersTable').innerHTML=(users||[]).map(function(u){
-    return'<tr><td style="font-weight:500">'+u.name+'</td><td style="font-size:12px;color:var(--tm)">'+u.email+'</td><td><span class="role-tag '+u.role+'">'+u.role+'</span></td><td style="font-size:12px;color:var(--tm)">'+((u.clients||[]).join(', ')||'--')+'</td></tr>';}).join('');}
+async function ls(){var conn=await ac('/admin/trello-connection');var ce=document.getElementById('cs2'),cf2=document.getElementById('cf');
+  if(conn&&conn.trello_api_key){ce.innerHTML='<div style="padding:12px 16px;background:var(--gnbg);border-radius:var(--rs);font-weight:600;font-size:13px;color:var(--gn)">Trello conectado -- '+(conn.board_ids||[]).length+' board(s)</div>';cf2.classList.add('hide');}
+  else{ce.innerHTML='';cf2.classList.remove('hide');}
+  var users=await ac('/admin/users');document.getElementById('ut').innerHTML=(users||[]).map(function(u){
+    return'<tr><td style="font-weight:500">'+u.name+'</td><td style="font-size:12px;color:var(--tm)">'+u.email+'</td><td><span class="rt '+u.role+'">'+u.role+'</span></td><td style="font-size:12px">'+((u.clients||[]).join(', ')||'--')+'</td></tr>';}).join('');}
 
-document.getElementById('connForm').onsubmit=async function(e){e.preventDefault();await apiCall('/admin/trello-connection',{method:'POST',body:JSON.stringify({trello_api_key:document.getElementById('connKey').value,trello_token:document.getElementById('connToken').value,board_ids:document.getElementById('connBoards').value.split(',').map(function(s){return s.trim()}).filter(Boolean)})});showToast('Trello conectado!','success');loadSettings();};
-document.getElementById('addUserForm').onsubmit=async function(e){e.preventDefault();await apiCall('/admin/users',{method:'POST',body:JSON.stringify({name:document.getElementById('newName').value,email:document.getElementById('newEmail').value,password:document.getElementById('newPass').value,role:document.getElementById('newRole').value})});document.getElementById('newName').value='';document.getElementById('newEmail').value='';document.getElementById('newPass').value='';showToast('Usuario criado!','success');loadSettings();};
-async function syncNow(){await apiCall('/admin/sync',{method:'POST'});showToast('Sincronizacao iniciada!','success');}
-function showToast(m,t){var x=document.querySelector('.toast');if(x)x.remove();var e=document.createElement('div');e.className='toast '+(t||'');e.textContent=m;document.body.appendChild(e);setTimeout(function(){e.remove();},5000);}
-sb.auth.getSession().then(function(r){if(r.data.session)initApp();else showLogin();});
+document.getElementById('cf').onsubmit=async function(e){e.preventDefault();await ac('/admin/trello-connection',{method:'POST',body:JSON.stringify({trello_api_key:document.getElementById('ck').value,trello_token:document.getElementById('cto').value,board_ids:document.getElementById('cb').value.split(',').map(function(s){return s.trim()}).filter(Boolean)})});st('Trello conectado!','success');ls();};
+document.getElementById('uf').onsubmit=async function(e){e.preventDefault();await ac('/admin/users',{method:'POST',body:JSON.stringify({name:document.getElementById('nn').value,email:document.getElementById('ne').value,password:document.getElementById('np').value,role:document.getElementById('nr').value})});document.getElementById('nn').value='';document.getElementById('ne').value='';document.getElementById('np').value='';st('Usuario criado!','success');ls();};
+async function sy(){await ac('/admin/sync',{method:'POST'});st('Sincronizacao iniciada!','success');}
+function st(m,t){var x=document.querySelector('.toast');if(x)x.remove();var e=document.createElement('div');e.className='toast '+(t||'');e.textContent=m;document.body.appendChild(e);setTimeout(function(){e.remove();},5000);}
+sb.auth.getSession().then(function(r){if(r.data.session)ia();else sl();});
 </script>
 </body>
 </html>
