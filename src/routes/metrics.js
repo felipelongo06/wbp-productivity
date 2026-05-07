@@ -16,6 +16,12 @@ function applyRoleFilter(query, user) {
 function applyExtraFilters(query, req) {
   if (req.query.client && req.query.client !== "all") query = query.eq("client", req.query.client);
   if (req.query.person && req.query.person !== "all") query = query.eq("responsible", req.query.person);
+  if (req.query.complexity && req.query.complexity !== "all") {
+    var parts = req.query.complexity.split("-");
+    if (parts.length === 2) {
+      query = query.gte("complexity", parseInt(parts[0])).lte("complexity", parseInt(parts[1]));
+    }
+  }
   return query;
 }
 
@@ -161,7 +167,7 @@ router.get("/recent-cards", async function(req, res) {
   var orgId = req.orgId, user = req.user, limit = parseInt(req.query.limit) || 20;
   try {
     var q = supabase.from("cards")
-      .select("id, title, client, category, priority, responsible, list_name, status, created_at, completed_at, time_to_complete_hours, due_date")
+      .select("id, title, client, category, priority, responsible, complexity, list_name, status, created_at, completed_at, time_to_complete_hours, due_date")
       .eq("org_id", orgId).order("created_at", { ascending: false }).limit(limit);
     if (req.query.status) q = q.eq("status", req.query.status);
     q = applyExtraFilters(applyRoleFilter(q, user), req);

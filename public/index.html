@@ -88,7 +88,8 @@
           <button class="pbtn" onclick="spr(7)">7 dias</button><button class="pbtn" onclick="spr(14)">14 dias</button>
           <button class="pbtn active" onclick="spr(30)">30 dias</button><button class="pbtn" onclick="spr(90)">90 dias</button></div>
           <div class="fb"><select class="fs" id="fc" onchange="ld()"><option value="all">Todos os clientes</option></select>
-          <select class="fs" id="fp" onchange="ld()"><option value="all">Todos os responsaveis</option></select></div>
+          <select class="fs" id="fp" onchange="ld()"><option value="all">Todos os responsaveis</option></select>
+          <select class="fs" id="fx" onchange="ld()"><option value="all">Complexidade</option><option value="0-2">Trivial (0-2)</option><option value="3-4">Simples (3-4)</option><option value="5-6">Moderada (5-6)</option><option value="7-8">Complexa (7-8)</option><option value="9-10">Muito complexa (9-10)</option></select></div>
         </div>
       </div>
       <div class="sg">
@@ -107,7 +108,7 @@
         <div class="cc full"><div class="ct">Evolucao semanal</div><canvas id="c5" height="80"></canvas></div>
       </div>
       <div class="tc"><div class="tt"><h3>Atividades recentes</h3></div>
-        <table><thead><tr><th>Card</th><th>Cliente</th><th>Responsavel</th><th>Prioridade</th><th>Status</th><th>Tempo</th></tr></thead><tbody id="rt"></tbody></table>
+        <table><thead><tr><th>Card</th><th>Cliente</th><th>Responsavel</th><th>Prioridade</th><th>Compl.</th><th>Status</th><th>Tempo</th></tr></thead><tbody id="rt"></tbody></table>
       </div>
     </div>
     <div id="ps" class="hide">
@@ -132,7 +133,7 @@ Chart.defaults.color='#9aa4b2';Chart.defaults.borderColor='#e3e8ef';Chart.defaul
 
 async function ac(p,o){var s=(await sb.auth.getSession()).data.session;if(!s)throw'x';
   return(await fetch(API+'/api'+p,{...o,headers:{'Authorization':'Bearer '+s.access_token,'Content-Type':'application/json',...(o?.headers||{})}})).json();}
-function gf(){var c=document.getElementById('fc').value,p=document.getElementById('fp').value,r='';if(c&&c!=='all')r+='&client='+encodeURIComponent(c);if(p&&p!=='all')r+='&person='+encodeURIComponent(p);return r;}
+function gf(){var c=document.getElementById('fc').value,p=document.getElementById('fp').value,x=document.getElementById('fx').value,r='';if(c&&c!=='all')r+='&client='+encodeURIComponent(c);if(p&&p!=='all')r+='&person='+encodeURIComponent(p);if(x&&x!=='all')r+='&complexity='+x;return r;}
 
 document.getElementById('lf').onsubmit=async function(e){e.preventDefault();var b=document.getElementById('lb2'),er=document.getElementById('lerr');b.disabled=true;er.classList.add('hide');
   var{error}=await sb.auth.signInWithPassword({email:document.getElementById('le').value,password:document.getElementById('lp2').value});
@@ -183,10 +184,12 @@ async function ld(){var f=gf(),d=cp;
   tb.innerHTML=(rc||[]).map(function(c){var ts=c.time_to_complete_hours?(c.time_to_complete_hours>24?(c.time_to_complete_hours/24).toFixed(1)+'d':c.time_to_complete_hours.toFixed(0)+'h'):'--';
     var od=c.status==='active'&&c.due_date&&new Date(c.due_date)<new Date();var st=od?'overdue':c.status;var stl=od?'Atrasado':c.status==='completed'?'Concluido':'Ativo';
     var pr=c.priority||'neutra';var prl={altissima:'Altissima',alta:'Alta',media:'Media',baixa:'Baixa',neutra:'Neutra'};
+    var cx=c.complexity!=null?c.complexity:'--';var cxc=cx>=9?'var(--rd)':cx>=7?'var(--or)':cx>=5?'var(--pu)':cx>=3?'var(--bl)':'var(--gn)';
     return'<tr><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500'+(od?';color:var(--rd)':'')+'" >'+c.title+'</td>'+
       '<td style="color:var(--tm)">'+(c.client||'--')+'</td>'+
       '<td style="color:var(--tm)">'+(c.responsible||'--')+'</td>'+
       '<td><span class="tag p-'+pr+'">'+(prl[pr]||pr)+'</span></td>'+
+      '<td style="text-align:center"><span style="display:inline-block;min-width:28px;padding:3px 8px;border-radius:20px;font-size:12px;font-weight:700;background:'+cxc+';color:white;">'+cx+'</span></td>'+
       '<td><span class="tag '+st+'">'+stl+'</span></td>'+
       '<td style="font-family:JetBrains Mono;font-size:12px;color:var(--tm)">'+ts+'</td></tr>';}).join('');}
 

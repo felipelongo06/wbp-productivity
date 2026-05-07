@@ -71,6 +71,7 @@ async function syncBoard(orgId, boardId, authParams, conn) {
           client: client,
           category: cat.category,
           subcategory: cat.subcategory,
+          complexity: cat.complexity || 5,
           priority: parsed.priority,
           responsible: parsed.responsible,
           assigned_to: card.idMembers || [],
@@ -116,6 +117,7 @@ async function syncBoard(orgId, boardId, authParams, conn) {
           var cat2 = await categorizeCard(card.name, card.desc, labelNames);
           updates.category = cat2.category;
           updates.subcategory = cat2.subcategory;
+          updates.complexity = cat2.complexity || 5;
         }
 
         await supabase.from("cards").update(updates).eq("id", existing.id);
