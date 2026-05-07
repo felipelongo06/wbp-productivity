@@ -112,4 +112,44 @@ router.post("/sync", requireRole("gestao", "cs"), async function(req, res) {
   syncOrganization(req.orgId).catch(function(e) { console.error("[Sync] Erro:", e); });
 });
 
+// ========== GESTAO: RECATEGORIZAR TODOS OS CARDS ==========
+
+router.post("/recategorize", requireRole("gestao"), async function(req, res) {
+  res.json({ status: "started" });
+
+  try {
+    var { data: cards } = await supabase.from("cards")
+      .select("id, title, description, labels")
+      .eq("org_id", req.orgId);
+
+    if (!cards || !cards.length) return;
+    console.log("[Recategorize] " + cards.length + " cards para recategorizar");
+
+    var { categorizeCard } = require("../categorizer");
+    var { parseLabels } = require("../label-parser");
+
+    for (var i = 0; i < cards.length; i++) {
+      var c = cards[i];
+      var labelNames = (c.labels || []).map(function(l) { return l.name || ""; });
+      var parsed = parseLabels(c.labels || []);
+      var cat = await categorizeCard(c.title, c.description, labelNames);
+
+      await supabase.from("cards").update({
+        category: cat.category,
+        subcategory: cat.subcategory,
+        complexity: cat.complexity || 5,
+        priority: parsed.priority,
+        responsible: parsed.responsible,
+        client: parsed.client || undefined,
+      }).eq("id", c.id);
+
+      if ((i + 1) % 10 === 0) console.log("[Recategorize] " + (i + 1) + "/" + cards.length);
+    }
+
+    console.log("[Recategorize] Concluido!");
+  } catch (err) {
+    console.error("[Recategorize] Erro:", err.message);
+  }
+});
+
 module.exports = router;

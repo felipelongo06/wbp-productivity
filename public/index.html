@@ -87,9 +87,10 @@
         <div class="ctrls"><div class="pb">
           <button class="pbtn" onclick="spr(7)">7 dias</button><button class="pbtn" onclick="spr(14)">14 dias</button>
           <button class="pbtn active" onclick="spr(30)">30 dias</button><button class="pbtn" onclick="spr(90)">90 dias</button></div>
-          <div class="fb"><select class="fs" id="fc" onchange="ld()"><option value="all">Todos os clientes</option></select>
-          <select class="fs" id="fp" onchange="ld()"><option value="all">Todos os responsaveis</option></select>
-          <select class="fs" id="fx" onchange="ld()"><option value="all">Complexidade</option><option value="0-2">Trivial (0-2)</option><option value="3-4">Simples (3-4)</option><option value="5-6">Moderada (5-6)</option><option value="7-8">Complexa (7-8)</option><option value="9-10">Muito complexa (9-10)</option></select></div>
+          <div class="fb"><select class="fs" id="fc"><option value="all">Todos os clientes</option></select>
+          <select class="fs" id="fp"><option value="all">Todos os responsaveis</option></select>
+          <select class="fs" id="fx"><option value="all">Complexidade</option><option value="0-2">Trivial (0-2)</option><option value="3-4">Simples (3-4)</option><option value="5-6">Moderada (5-6)</option><option value="7-8">Complexa (7-8)</option><option value="9-10">Muito complexa (9-10)</option></select>
+          <button class="btn ba bs" onclick="ld()" style="white-space:nowrap">Filtrar</button></div>
         </div>
       </div>
       <div class="sg">
@@ -113,7 +114,7 @@
     </div>
     <div id="ps" class="hide">
       <div class="ph"><div><h1>Configuracoes</h1><p>Gerencie conexoes e equipe</p></div></div>
-      <div class="stc"><h3>Conexao Trello <button class="btn bs" onclick="sy()">Sincronizar</button></h3><div id="cs2"></div>
+      <div class="stc"><h3>Conexao Trello <span><button class="btn bs" onclick="sy()">Sincronizar</button> <button class="btn bs" onclick="rc2()" style="margin-left:4px;color:var(--or);border-color:var(--or)">Recategorizar tudo</button></span></h3><div id="cs2"></div>
         <form id="cf" class="hide"><div class="fg"><div class="fgr"><label>API Key</label><input class="input" id="ck" /></div><div class="fgr"><label>Token</label><input class="input" id="cto" /></div></div>
         <div class="fgr" style="margin-top:14px"><label>Board IDs (virgula)</label><input class="input" id="cb" /></div><button class="btn ba" type="submit" style="margin-top:14px">Conectar</button></form></div>
       <div class="stc"><h3>Novo usuario</h3><form id="uf"><div class="fg"><div class="fgr"><label>Nome</label><input class="input" id="nn" required /></div><div class="fgr"><label>Email</label><input class="input" type="email" id="ne" required /></div>
@@ -204,6 +205,7 @@ async function ls(){var conn=await ac('/admin/trello-connection');var ce=documen
 document.getElementById('cf').onsubmit=async function(e){e.preventDefault();await ac('/admin/trello-connection',{method:'POST',body:JSON.stringify({trello_api_key:document.getElementById('ck').value,trello_token:document.getElementById('cto').value,board_ids:document.getElementById('cb').value.split(',').map(function(s){return s.trim()}).filter(Boolean)})});st('Trello conectado!','success');ls();};
 document.getElementById('uf').onsubmit=async function(e){e.preventDefault();await ac('/admin/users',{method:'POST',body:JSON.stringify({name:document.getElementById('nn').value,email:document.getElementById('ne').value,password:document.getElementById('np').value,role:document.getElementById('nr').value})});document.getElementById('nn').value='';document.getElementById('ne').value='';document.getElementById('np').value='';st('Usuario criado!','success');ls();};
 async function sy(){await ac('/admin/sync',{method:'POST'});st('Sincronizacao iniciada!','success');}
+async function rc2(){if(!confirm('Recategorizar todos os cards com AI? Isso consome tokens da API e pode levar alguns minutos.'))return;await ac('/admin/recategorize',{method:'POST'});st('Recategorizacao iniciada! Aguarde alguns minutos e atualize a pagina.','success');}
 function st(m,t){var x=document.querySelector('.toast');if(x)x.remove();var e=document.createElement('div');e.className='toast '+(t||'');e.textContent=m;document.body.appendChild(e);setTimeout(function(){e.remove();},5000);}
 sb.auth.getSession().then(function(r){if(r.data.session)ia();else sl();});
 </script>
