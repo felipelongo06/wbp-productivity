@@ -126,6 +126,11 @@
           <option value="created_at">Mais recentes</option>
           <option value="complexity-desc">Complexidade (maior)</option>
           <option value="complexity-asc">Complexidade (menor)</option>
+        </select>
+        <select class="fs" id="statusFilter" onchange="lac(1)" style="font-size:12px;padding:5px 28px 5px 10px">
+          <option value="all">Todos os status</option>
+          <option value="completed">Concluidas</option>
+          <option value="active">Pendentes</option>
         </select></div></div>
         <table><thead><tr><th>Card</th><th>Cliente</th><th>Responsavel</th><th>Prioridade</th><th>Compl.</th><th>Lista</th><th>Status</th><th>Criado em</th></tr></thead><tbody id="at"></tbody></table>
         <div class="pag" id="allPag"></div>
@@ -222,7 +227,9 @@ async function ld(){showLoading();allPage=1;var f=gf(),d=cp;
 async function lac(pg){allPage=pg;var f=gf();
   var sv=document.getElementById('sortField').value;var sf='created_at',sd='desc';
   if(sv==='complexity-desc'){sf='complexity';sd='desc';}else if(sv==='complexity-asc'){sf='complexity';sd='asc';}
-  var res=await ac('/metrics/all-cards?page='+pg+'&per_page=10&sort='+sf+'&dir='+sd+f);
+  var stf=document.getElementById('statusFilter').value;
+  var statusParam=stf&&stf!=='all'?'&status='+stf:'';
+  var res=await ac('/metrics/all-cards?page='+pg+'&per_page=10&sort='+sf+'&dir='+sd+statusParam+f);
   var cards=res.cards||[],total=res.total||0,tp=res.totalPages||1;
   document.getElementById('allInfo').textContent=total+' atividades';
   var prl={altissima:'Altissima',alta:'Alta',media:'Media',baixa:'Baixa',neutra:'Neutra'};
