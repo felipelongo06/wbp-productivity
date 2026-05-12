@@ -167,12 +167,35 @@ router.get("/recent-cards", async function(req, res) {
   var orgId = req.orgId, user = req.user, limit = parseInt(req.query.limit) || 20;
   try {
     var q = supabase.from("cards")
-      .select("id, title, client, category, priority, responsible, complexity, list_name, status, created_at, completed_at, time_to_complete_hours, due_date")
+      .select("id, title, client, category, priority, responsible, complexity, list_name, status, created_at, completed_at, time_to_complete_hours, due_date, trello_card_id")
       .eq("org_id", orgId).order("created_at", { ascending: false }).limit(limit);
     if (req.query.status) q = q.eq("status", req.query.status);
     q = applyExtraFilters(applyRoleFilter(q, user), req);
     var { data } = await q;
     res.json(data || []);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.get("/all-cards", async function(req, res) {
+  var orgId = req.orgId, user = req.user;
+  var page = parseInt(req.query.page) || 1;
+  var perPage = parseInt(req.query.per_page) || 10;
+  var offset = (page - 1) * perPage;
+  try {
+    var countQ = supabase.from("cards").select("id", { count: "exact", head: true }).eq("org_id", orgId);
+    countQ = applyExtraFilters(applyRoleFilter(countQ, user), req);
+    var { count: total } = await countQ;
+    var sortField = req.query.sort || "created_at";
+    var sortDir = req.query.dir === "asc" ? true : false;
+    var validSorts = ["created_at", "complexity", "priority", "title", "client"];
+    if (validSorts.indexOf(sortField) < 0) sortField = "created_at";
+
+    var q = supabase.from("cards")
+      .select("id, title, client, category, priority, responsible, complexity, list_name, status, created_at, completed_at, time_to_complete_hours, due_date, trello_card_id")
+      .eq("org_id", orgId).order(sortField, { ascending: sortDir }).range(offset, offset + perPage - 1);
+    q = applyExtraFilters(applyRoleFilter(q, user), req);
+    var { data } = await q;
+    res.json({ cards: data || [], total: total || 0, page: page, perPage: perPage, totalPages: Math.ceil((total || 0) / perPage) });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
