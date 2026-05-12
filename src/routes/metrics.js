@@ -183,6 +183,7 @@ router.get("/all-cards", async function(req, res) {
   var offset = (page - 1) * perPage;
   try {
     var countQ = supabase.from("cards").select("id", { count: "exact", head: true }).eq("org_id", orgId);
+    if (req.query.status) countQ = countQ.eq("status", req.query.status);
     countQ = applyExtraFilters(applyRoleFilter(countQ, user), req);
     var { count: total } = await countQ;
     var sortField = req.query.sort || "created_at";
@@ -193,6 +194,7 @@ router.get("/all-cards", async function(req, res) {
     var q = supabase.from("cards")
       .select("id, title, client, category, priority, responsible, complexity, list_name, status, created_at, completed_at, time_to_complete_hours, due_date, trello_card_id")
       .eq("org_id", orgId).order(sortField, { ascending: sortDir }).range(offset, offset + perPage - 1);
+    if (req.query.status) q = q.eq("status", req.query.status);
     q = applyExtraFilters(applyRoleFilter(q, user), req);
     var { data } = await q;
     res.json({ cards: data || [], total: total || 0, page: page, perPage: perPage, totalPages: Math.ceil((total || 0) / perPage) });
