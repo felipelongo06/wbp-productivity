@@ -139,7 +139,6 @@ router.post("/recategorize", requireRole("gestao"), async function(req, res) {
         subcategory: cat.subcategory,
         complexity: cat.complexity || 5,
         priority: parsed.priority,
-        responsible: parsed.responsible,
         client: parsed.client || undefined,
       }).eq("id", c.id);
 
