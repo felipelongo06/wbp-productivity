@@ -57,18 +57,7 @@ function classifyLabel(label) {
     return { type: 'priority', value: PRIORITY_LABELS[cleanName] };
   }
 
-  // 3. Se o nome parece um nome de pessoa (1-2 palavras, sem caracteres especiais de empresa)
-  // Heuristica: nomes de pessoa sao 1-2 palavras curtas sem numeros/simbolos
-  var words = name.split(/\s+/);
-  var looksLikePerson = words.length <= 3 &&
-    words.every(function(w) { return /^[A-ZÀ-Ú][a-zà-ú]+$/.test(w); }) &&
-    !nameLower.match(/hotel|viagen|grupo|instituto|agencia|midia|paga|ads|meta|google|social|crm|tracking/);
-
-  if (looksLikePerson) {
-    return { type: 'person', value: name };
-  }
-
-  // 4. Provavelmente cliente
+  // 3. Provavelmente cliente
   return { type: 'client', value: name };
 }
 
@@ -80,7 +69,6 @@ function classifyLabel(label) {
 function parseLabels(labels) {
   var result = {
     priority: 'neutra',
-    responsible: null,
     client: null,
     other: [],
   };
@@ -92,10 +80,6 @@ function parseLabels(labels) {
     switch (classified.type) {
       case 'priority':
         result.priority = classified.value;
-        break;
-      case 'person':
-        // Se ja tem um responsavel, pega o primeiro
-        if (!result.responsible) result.responsible = classified.value;
         break;
       case 'client':
         if (!result.client) result.client = classified.value;
