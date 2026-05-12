@@ -4,14 +4,10 @@ var { PRIORITY_DISPLAY } = require("../label-parser");
 var router = express.Router();
 
 function applyRoleFilter(query, user) {
-  if (user.role === "gestao") return query;
+  if (user.role === "gestao" || user.role === "operacao") return query;
   if (user.role === "cs") {
     if (user.clients && user.clients.length > 0) return query.in("client", user.clients);
     return query.eq("client", "__none__");
-  }
-  if (user.role === "operacao") {
-    var matchName = user.trello_member_id || user.name;
-    return query.eq("responsible", matchName);
   }
   return query;
 }
