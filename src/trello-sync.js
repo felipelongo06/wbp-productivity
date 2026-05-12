@@ -45,6 +45,10 @@ async function syncBoard(orgId, boardId, authParams, conn) {
       var parsed = parseLabels(card.labels || []);
       var labelNames = (card.labels || []).map(function(l) { return l.name; });
 
+      // Responsavel: usar members do Trello (nao labels)
+      var memberNames = (card.members || []).map(function(m) { return m.fullName || m.username; });
+      var responsible = memberNames.length > 0 ? memberNames[0] : null;
+
       // Cliente: label > titulo [Cliente] > board name
       var client = parsed.client;
       if (!client) {
@@ -73,9 +77,9 @@ async function syncBoard(orgId, boardId, authParams, conn) {
           subcategory: cat.subcategory,
           complexity: cat.complexity || 5,
           priority: parsed.priority,
-          responsible: parsed.responsible,
+          responsible: responsible,
           assigned_to: card.idMembers || [],
-          assigned_names: parsed.responsible ? [parsed.responsible] : [],
+          assigned_names: memberNames,
           status: isCompleted ? "completed" : "active",
           created_at: card.dateLastActivity || new Date().toISOString(),
           completed_at: isCompleted ? new Date().toISOString() : null,
@@ -91,8 +95,9 @@ async function syncBoard(orgId, boardId, authParams, conn) {
           list_name: listName,
           title: card.name,
           priority: parsed.priority,
-          responsible: parsed.responsible,
-          assigned_names: parsed.responsible ? [parsed.responsible] : [],
+          responsible: responsible,
+          assigned_to: card.idMembers || [],
+          assigned_names: memberNames,
           labels: card.labels || [],
           client: client,
           last_synced_at: new Date().toISOString(),
