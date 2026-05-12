@@ -62,11 +62,21 @@
     .ba{background:var(--ac);color:white;border-color:var(--ac)}.ba:hover{background:var(--acd)}.bs{padding:6px 12px;font-size:12px;border-radius:8px}
     .rt{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase}.rt.gestao{background:var(--rdbg);color:var(--rd)}.rt.cs{background:var(--orbg);color:var(--or)}.rt.operacao{background:var(--blbg);color:var(--bl)}
     .toast{position:fixed;bottom:24px;right:24px;padding:14px 22px;border-radius:var(--rs);font-size:14px;font-weight:500;background:white;box-shadow:0 8px 30px rgba(0,0,0,.12);z-index:1000;animation:su .3s;border-left:4px solid}.toast.success{border-color:var(--gn);color:var(--gn)}.toast.error{border-color:var(--rd);color:var(--rd)}
+    .loading-overlay{position:fixed;inset:0;background:rgba(240,242,245,.85);z-index:200;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(2px)}
+    .spinner{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite}
+    .loading-text{font-size:14px;color:var(--tm);font-weight:500}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .pag{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 20px;border-top:1px solid var(--bd)}
+    .pag-btn{padding:6px 14px;border-radius:6px;border:1px solid var(--bd);background:white;color:var(--td);font-family:'Plus Jakarta Sans';font-size:12px;font-weight:600;cursor:pointer}.pag-btn:hover{background:var(--bg)}.pag-btn:disabled{opacity:.4;cursor:default}.pag-btn.active{background:var(--ac);color:white;border-color:var(--ac)}
+    .pag-info{font-size:12px;color:var(--tl)}
+    .trello-link{color:var(--td);text-decoration:none;font-weight:500;transition:color .15s}.trello-link:hover{color:var(--ac);text-decoration:underline}
     @keyframes su{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
     @media(max-width:1024px){.sidebar{display:none}.main{margin-left:0}.sg{grid-template-columns:repeat(2,1fr)}.cg,.fg{grid-template-columns:1fr}.fb{flex-wrap:wrap}}
   </style>
 </head>
 <body>
+<div id="loadingOverlay" class="loading-overlay hide"><div class="spinner"></div><div class="loading-text">Carregando dados...</div></div>
+
 <div id="lp" class="login-page"><div class="login-card">
   <div class="logo"><div class="lb">W</div><div class="lt">WBP <span>Productivity</span></div></div>
   <h2>Bem-vindo de volta</h2><p>Entre com suas credenciais</p>
@@ -111,6 +121,15 @@
       <div class="tc"><div class="tt"><h3>Atividades recentes</h3></div>
         <table><thead><tr><th>Card</th><th>Cliente</th><th>Responsavel</th><th>Prioridade</th><th>Compl.</th><th>Status</th><th>Tempo</th></tr></thead><tbody id="rt"></tbody></table>
       </div>
+      <div class="tc"><div class="tt"><h3>Todas as atividades</h3><div style="display:flex;align-items:center;gap:8px"><span class="pag-info" id="allInfo"></span>
+        <select class="fs" id="sortField" onchange="lac(1)" style="font-size:12px;padding:5px 28px 5px 10px">
+          <option value="created_at">Mais recentes</option>
+          <option value="complexity-desc">Complexidade (maior)</option>
+          <option value="complexity-asc">Complexidade (menor)</option>
+        </select></div></div>
+        <table><thead><tr><th>Card</th><th>Cliente</th><th>Responsavel</th><th>Prioridade</th><th>Compl.</th><th>Lista</th><th>Status</th><th>Criado em</th></tr></thead><tbody id="at"></tbody></table>
+        <div class="pag" id="allPag"></div>
+      </div>
     </div>
     <div id="ps" class="hide">
       <div class="ph"><div><h1>Configuracoes</h1><p>Gerencie conexoes e equipe</p></div></div>
@@ -126,7 +145,9 @@
 </div>
 <script>
 var SU='https://ciggioucwilhqpuxtzue.supabase.co',SA='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZ2dpb3Vjd2lsaHFwdXh0enVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MDY2MDAsImV4cCI6MjA5MzA4MjYwMH0.1JzEq9IrOPNgwr4NYiQYrVPPOTmneobPJYCvkEN8BSw';
-var sb=window.supabase.createClient(SU,SA),API=window.location.origin,cu=null,cp=30,ch={};
+var sb=window.supabase.createClient(SU,SA),API=window.location.origin,cu=null,cp=30,ch={},allPage=1;
+function showLoading(){document.getElementById('loadingOverlay').classList.remove('hide');}
+function hideLoading(){document.getElementById('loadingOverlay').classList.add('hide');}
 var CL={midia_paga:'Midia Paga',social_media:'Social Media',crm:'CRM',ai_automacao:'AI/Auto',tracking_dados:'Tracking',estrategia:'Estrategia',criacao:'Criacao',operacional:'Operacional',sem_categoria:'Outros'};
 var CO=['#5eba9c','#4a90d9','#7c6cdb','#f5a623','#e74c5e','#ec4899','#14b8a6','#8b5cf6'];
 var PC={altissima:'#e74c5e',alta:'#f5a623',media:'#dab600',baixa:'#5eba9c',neutra:'#9aa4b2'};
@@ -140,7 +161,7 @@ document.getElementById('lf').onsubmit=async function(e){e.preventDefault();var 
   var{error}=await sb.auth.signInWithPassword({email:document.getElementById('le').value,password:document.getElementById('lp2').value});
   if(error){er.textContent=error.message;er.classList.remove('hide');b.disabled=false;}else ia();};
 
-async function ia(){var s=(await sb.auth.getSession()).data.session;if(!s){sl();return;}try{cu=await ac('/admin/me');}catch(e){sl();return;}
+async function ia(){showLoading();var s=(await sb.auth.getSession()).data.session;if(!s){hideLoading();sl();return;}try{cu=await ac('/admin/me');}catch(e){hideLoading();sl();return;}
   document.getElementById('lp').classList.add('hide');document.getElementById('ap').classList.remove('hide');
   document.getElementById('sn').textContent=cu.name;document.getElementById('sr').textContent=cu.role;document.getElementById('ua').textContent=(cu.name||'U')[0].toUpperCase();
   var h=new Date().getHours();document.getElementById('gt').textContent=(h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+', '+(cu.name||'').split(' ')[0];
@@ -159,8 +180,8 @@ async function lf2(){try{var f=await ac('/metrics/filters');var cs=document.getE
   cs.innerHTML='<option value="all">Todos os clientes</option>';(f.clients||[]).forEach(function(c){cs.innerHTML+='<option value="'+c+'">'+c+'</option>';});
   ps.innerHTML='<option value="all">Todos os responsaveis</option>';(f.people||[]).forEach(function(p){ps.innerHTML+='<option value="'+p+'">'+p+'</option>';});}catch(e){}}
 
-async function ld(){var f=gf(),d=cp;
-  var[ov,cl,cat,pri,per,tl,rc]=await Promise.all([ac('/metrics/overview?days='+d+f),ac('/metrics/by-client?days='+d+f),ac('/metrics/by-category?days='+d+f),
+async function ld(){showLoading();allPage=1;var f=gf(),d=cp;
+  try{var[ov,cl,cat,pri,per,tl,rc]=await Promise.all([ac('/metrics/overview?days='+d+f),ac('/metrics/by-client?days='+d+f),ac('/metrics/by-category?days='+d+f),
     ac('/metrics/by-priority?days='+d+f),ac('/metrics/by-person?days='+d+f),ac('/metrics/timeline?days='+d+f),ac('/metrics/recent-cards?limit=12'+f)]);
 
   document.getElementById('s1').textContent=ov.totalCards||0;document.getElementById('s2').textContent=ov.activeCards||0;
@@ -186,13 +207,44 @@ async function ld(){var f=gf(),d=cp;
     var od=c.status==='active'&&c.due_date&&new Date(c.due_date)<new Date();var st=od?'overdue':c.status;var stl=od?'Atrasado':c.status==='completed'?'Concluido':'Ativo';
     var pr=c.priority||'neutra';var prl={altissima:'Altissima',alta:'Alta',media:'Media',baixa:'Baixa',neutra:'Neutra'};
     var cx=c.complexity!=null?c.complexity:'--';var cxc=cx>=9?'var(--rd)':cx>=7?'var(--or)':cx>=5?'var(--pu)':cx>=3?'var(--bl)':'var(--gn)';
-    return'<tr><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500'+(od?';color:var(--rd)':'')+'" >'+c.title+'</td>'+
+    var turl=c.trello_card_id?'https://trello.com/c/'+c.trello_card_id:'#';
+    return'<tr><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'+(od?';color:var(--rd)':'')+'" ><a href="'+turl+'" target="_blank" class="trello-link">'+c.title+'</a></td>'+
       '<td style="color:var(--tm)">'+(c.client||'--')+'</td>'+
       '<td style="color:var(--tm)">'+(c.responsible||'--')+'</td>'+
       '<td><span class="tag p-'+pr+'">'+(prl[pr]||pr)+'</span></td>'+
       '<td style="text-align:center"><span style="display:inline-block;min-width:28px;padding:3px 8px;border-radius:20px;font-size:12px;font-weight:700;background:'+cxc+';color:white;">'+cx+'</span></td>'+
       '<td><span class="tag '+st+'">'+stl+'</span></td>'+
-      '<td style="font-family:JetBrains Mono;font-size:12px;color:var(--tm)">'+ts+'</td></tr>';}).join('');}
+      '<td style="font-family:JetBrains Mono;font-size:12px;color:var(--tm)">'+ts+'</td></tr>';}).join('');
+
+  await lac(1);
+  }catch(e){console.error(e);}hideLoading();}
+
+async function lac(pg){allPage=pg;var f=gf();
+  var sv=document.getElementById('sortField').value;var sf='created_at',sd='desc';
+  if(sv==='complexity-desc'){sf='complexity';sd='desc';}else if(sv==='complexity-asc'){sf='complexity';sd='asc';}
+  var res=await ac('/metrics/all-cards?page='+pg+'&per_page=10&sort='+sf+'&dir='+sd+f);
+  var cards=res.cards||[],total=res.total||0,tp=res.totalPages||1;
+  document.getElementById('allInfo').textContent=total+' atividades';
+  var prl={altissima:'Altissima',alta:'Alta',media:'Media',baixa:'Baixa',neutra:'Neutra'};
+  document.getElementById('at').innerHTML=cards.map(function(c){
+    var od=c.status==='active'&&c.due_date&&new Date(c.due_date)<new Date();var st=od?'overdue':c.status;var stl=od?'Atrasado':c.status==='completed'?'Concluido':'Ativo';
+    var pr=c.priority||'neutra';var cx=c.complexity!=null?c.complexity:'--';var cxc=cx>=9?'var(--rd)':cx>=7?'var(--or)':cx>=5?'var(--pu)':cx>=3?'var(--bl)':'var(--gn)';
+    var turl=c.trello_card_id?'https://trello.com/c/'+c.trello_card_id:'#';
+    var dt=c.created_at?new Date(c.created_at).toLocaleDateString('pt-BR'):'--';
+    return'<tr><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'+(od?';color:var(--rd)':'')+'"><a href="'+turl+'" target="_blank" class="trello-link">'+c.title+'</a></td>'+
+      '<td style="color:var(--tm)">'+(c.client||'--')+'</td>'+
+      '<td style="color:var(--tm)">'+(c.responsible||'--')+'</td>'+
+      '<td><span class="tag p-'+pr+'">'+(prl[pr]||pr)+'</span></td>'+
+      '<td style="text-align:center"><span style="display:inline-block;min-width:28px;padding:3px 8px;border-radius:20px;font-size:12px;font-weight:700;background:'+cxc+';color:white;">'+cx+'</span></td>'+
+      '<td style="color:var(--tm);font-size:12px">'+(c.list_name||'--')+'</td>'+
+      '<td><span class="tag '+st+'">'+stl+'</span></td>'+
+      '<td style="font-family:JetBrains Mono;font-size:12px;color:var(--tm)">'+dt+'</td></tr>';}).join('');
+
+  var pagH='<button class="pag-btn" onclick="lac('+(pg-1)+')"'+(pg<=1?' disabled':'')+'>Anterior</button>';
+  for(var i=1;i<=tp;i++){if(tp>7&&i>2&&i<tp-1&&Math.abs(i-pg)>1){if(i===3||i===tp-2)pagH+='<span class="pag-info">...</span>';continue;}
+    pagH+='<button class="pag-btn'+(i===pg?' active':'')+'" onclick="lac('+i+')">'+i+'</button>';}
+  pagH+='<button class="pag-btn" onclick="lac('+(pg+1)+')"'+(pg>=tp?' disabled':'')+'>Proximo</button>';
+  document.getElementById('allPag').innerHTML=pagH;}
 
 function dc(id){if(ch[id]){ch[id].destroy();delete ch[id];}}
 
